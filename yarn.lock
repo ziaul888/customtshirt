@@ -1279,6 +1279,11 @@ doctrine@^2.1.0:
   dependencies:
     esutils "^2.0.2"
 
+dom-to-image@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/dom-to-image/-/dom-to-image-2.6.0.tgz#8a503608088c87b1c22f9034ae032e1898955867"
+  integrity sha512-Dt0QdaHmLpjURjU7Tnu3AgYSF2LuOmksSGsUcE6ItvJoCWTBEmiMXcqBdNSAm9+QbbwD7JMoVsuuKX6ZVQv1qA==
+
 domexception@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/domexception/-/domexception-4.0.0.tgz#4ad1be56ccadc86fc76d033353999a8037d03673"
@@ -1745,10 +1750,10 @@ express@^5.0.1:
     type-is "^2.0.1"
     vary "^1.1.2"
 
-fabric@^6.6.4:
-  version "6.6.4"
-  resolved "https://registry.yarnpkg.com/fabric/-/fabric-6.6.4.tgz#1a135ed36a35842bc788fb9f1e4ee673013176eb"
-  integrity sha512-GJ+9CsTo4oDGO6eEsSYaxgaZnndsiVr/pl8itfLkaBuxH4ek9+hxKfpjzrIaiSGzoZ8jVxUP8pFJaCronLxukA==
+fabric@^6.6.5:
+  version "6.6.5"
+  resolved "https://registry.yarnpkg.com/fabric/-/fabric-6.6.5.tgz#6f42b9124e0fb7d4e3bf1f2b141153e1e961c108"
+  integrity sha512-BFxyLDeLMMgtteqQwKAyRM+oSkf82lDFzsiC7AMob7k7ag7naFuHOtWtcll4v+M9Cpn5aqRBfz1shnsO0vZhbg==
   optionalDependencies:
     canvas "^2.11.2"
     jsdom "^20.0.1"

@@ -1,234 +1,194 @@
-// // components/FabricEditor.tsx
-// 'use client';
-//
-// import { useEffect, useRef, useState } from 'react';
-// import * as fabric from 'fabric';
-//
-// type EditorElement = {
-//     id: string;
-//     name: string;
-//     type: 'rect' | 'circle' | 'triangle' | 'text';
-//     icon: string;
-//     defaultOptions: fabric.Object;
-// };
-//
-// export default function FabricEditor() {
-//     const canvasRef = useRef<HTMLCanvasElement>(null);
-//     const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
-//     const [selectedElement, setSelectedElement] = useState<string | null>(null);
-//
-//     // Available elements in sidebar
-//     const editorElements: EditorElement[] = [
-//         {
-//             id: 'rect',
-//             name: 'Rectangle',
-//             type: 'rect',
-//             icon: '□',
-//             defaultOptions: {
-//                 width: 100,
-//                 height: 80,
-//                 fill: '#3b82f6', // blue-500
-//                 left: 100,
-//                 top: 100,
-//             } as fabric.IRectOptions,
-//         },
-//         {
-//             id: 'circle',
-//             name: 'Circle',
-//             type: 'circle',
-//             icon: '○',
-//             defaultOptions: {
-//                 radius: 50,
-//                 fill: '#ef4444', // red-500
-//                 left: 100,
-//                 top: 100,
-//             } as fabric.ICircleOptions,
-//         },
-//         {
-//             id: 'triangle',
-//             name: 'Triangle',
-//             type: 'triangle',
-//             icon: '△',
-//             defaultOptions: {
-//                 width: 100,
-//                 height: 100,
-//                 fill: '#10b981', // emerald-500
-//                 left: 100,
-//                 top: 100,
-//             } as fabric.ITriangleOptions,
-//         },
-//         {
-//             id: 'text',
-//             name: 'Text',
-//             type: 'text',
-//             icon: 'T',
-//             defaultOptions: {
-//                 text: 'Double click to edit',
-//                 fontSize: 20,
-//                 fill: '#000000',
-//                 left: 100,
-//                 top: 100,
-//                 width: 200,
-//             } as fabric.ITextOptions,
-//         },
-//     ];
-//
-//     // Initialize canvas
-//     useEffect(() => {
-//         if (!canvasRef.current) return;
-//
-//         fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
-//             width: 800,
-//             height: 600,
-//             backgroundColor: '#f8fafc', // slate-50
-//             selectionColor: 'rgba(59, 130, 246, 0.3)', // blue-500 with opacity
-//             selectionBorderColor: '#3b82f6', // blue-500
-//             selectionLineWidth: 2,
-//         });
-//
-//         // Enable object movement
-//         fabricCanvasRef.current.on('object:moving', () => {
-//             fabricCanvasRef.current?.renderAll();
-//         });
-//
-//         // Enable text editing on double click
-//         fabricCanvasRef.current.on('mouse:dblclick', (e: { target: { type: string; }; }) => {
-//             if (e.target?.type === 'textbox') {
-//                 const textObject = e.target as fabric.Textbox;
-//                 textObject.enterEditing();
-//                 textObject.selectAll();
-//             }
-//         });
-//
-//         return () => {
-//             fabricCanvasRef.current?.dispose();
-//         };
-//     }, []);
-//
-//     // Add selected element to canvas
-//     const addElementToCanvas = () => {
-//         if (!fabricCanvasRef.current || !selectedElement) return;
-//
-//         const element = editorElements.find((el) => el.id === selectedElement);
-//         if (!element) return;
-//
-//         try {
-//             let fabricObject: fabric.Object;
-//
-//             switch (element.type) {
-//                 case 'rect':
-//                     fabricObject = new fabric.Rect(element.defaultOptions as fabric.IRectOptions);
-//                     break;
-//                 case 'circle':
-//                     fabricObject = new fabric.Circle(element.defaultOptions as fabric.ICircleOptions);
-//                     break;
-//                 case 'triangle':
-//                     fabricObject = new fabric.Triangle(element.defaultOptions as fabric.ITriangleOptions);
-//                     break;
-//                 case 'text':
-//                     fabricObject = new fabric.Textbox(
-//                         element.defaultOptions.text?.toString() || 'Text',
-//                         element.defaultOptions as fabric.ITextOptions
-//                     );
-//                     break;
-//                 default:
-//                     throw new Error(`Unknown element type: ${element.type}`);
-//             }
-//
-//             fabricCanvasRef.current.add(fabricObject);
-//             fabricCanvasRef.current.setActiveObject(fabricObject);
-//             fabricCanvasRef.current.renderAll();
-//         } catch (error) {
-//             console.error('Error adding element:', error);
-//         }
-//     };
-//
-//     // Clear canvas
-//     const clearCanvas = () => {
-//         if (!fabricCanvasRef.current) return;
-//         fabricCanvasRef.current.clear();
-//         fabricCanvasRef.current.backgroundColor = '#f8fafc';
-//         fabricCanvasRef.current.renderAll();
-//     };
-//
-//     return (
-//         <div className="flex h-screen bg-white">
-//             {/* Sidebar */}
-//             {/*<div className="w-64 bg-gray-50 border-r border-gray-200 p-4 flex flex-col">*/}
-//             {/*    <h2 className="text-xl font-bold mb-6 text-gray-800">Elements</h2>*/}
-//
-//             {/*    <div className="space-y-3 flex-1">*/}
-//             {/*        {editorElements.map((element) => (*/}
-//             {/*            <div*/}
-//             {/*                key={element.id}*/}
-//             {/*                className={`p-4 border rounded-lg cursor-pointer transition-colors flex items-center space-x-3 ${*/}
-//             {/*                    selectedElement === element.id*/}
-//             {/*                        ? 'bg-blue-50 border-blue-200'*/}
-//             {/*                        : 'bg-white border-gray-200 hover:bg-gray-50'*/}
-//             {/*                }`}*/}
-//             {/*                onClick={() => setSelectedElement(element.id)}*/}
-//             {/*            >*/}
-//             {/*                <span className="text-2xl">{element.icon}</span>*/}
-//             {/*                <span className="font-medium text-gray-700">{element.name}</span>*/}
-//             {/*            </div>*/}
-//             {/*        ))}*/}
-//             {/*    </div>*/}
-//
-//             {/*    <div className="mt-auto space-y-3 pt-4 border-t border-gray-200">*/}
-//             {/*        <button*/}
-//             {/*            onClick={addElementToCanvas}*/}
-//             {/*            disabled={!selectedElement}*/}
-//             {/*            className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${*/}
-//             {/*                selectedElement*/}
-//             {/*                    ? 'bg-blue-600 text-white hover:bg-blue-700'*/}
-//             {/*                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'*/}
-//             {/*            }`}*/}
-//             {/*        >*/}
-//             {/*            Add to Canvas*/}
-//             {/*        </button>*/}
-//
-//             {/*        <button*/}
-//             {/*            onClick={clearCanvas}*/}
-//             {/*            className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"*/}
-//             {/*        >*/}
-//             {/*            Clear Canvas*/}
-//             {/*        </button>*/}
-//             {/*    </div>*/}
-//             {/*</div>*/}
-//
-//             {/* Canvas Area */}
-//             <div className="flex-1 flex flex-col">
-//                 <div className="border-b border-gray-200 p-4 bg-white">
-//                     <h1 className="text-xl font-bold text-gray-800">Design Editor</h1>
-//                 </div>
-//
-//                 <div className="flex-1 p-8 bg-gray-50 overflow-auto">
-//                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mx-auto" style={{ width: '800px', height: '600px' }}>
-//                         <canvas ref={canvasRef} />
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
+'use client';
+import { useEffect, useRef } from 'react';
+// @ts-ignore
+import * as fabric from 'fabric';
+// @ts-ignore
+import * as domtoimage from 'dom-to-image';
+import styles from '../../Tshirt.module.css';
 
+export default function TshirtDesigner() {
+    const tshirtDivRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
 
-import React from 'react';
+    useEffect(() => {
+        if (!canvasRef.current) return;
 
-const Editor:React.FC = () => {
+        // Initialize Fabric.js canvas
+        fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
+            selection: true,
+        });
+
+        // Add keyboard event listener
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Delete' && fabricCanvasRef.current) {
+                const activeObject = fabricCanvasRef.current.getActiveObject();
+                if (activeObject) {
+                    fabricCanvasRef.current.remove(activeObject);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup function
+        return () => {
+            if (fabricCanvasRef.current) {
+                fabricCanvasRef.current.dispose();
+            }
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    const updateTshirtImage = (imageURL: string) => {
+        if (!fabricCanvasRef.current) return;
+
+        fabric.Image.fromURL(imageURL, (img: { scaleToHeight: (arg0: number) => void; scaleToWidth: (arg0: number) => void; }) => {
+            img.scaleToHeight(300);
+            img.scaleToWidth(300);
+            fabricCanvasRef.current?.centerObject(img);
+            fabricCanvasRef.current?.add(img);
+            fabricCanvasRef.current?.renderAll();
+        });
+    };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (tshirtDivRef.current) {
+            tshirtDivRef.current.style.backgroundColor = e.target.value;
+        }
+    };
+
+    const handleDesignChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (e.target.value) {
+            updateTshirtImage(e.target.value);
+        }
+    };
+
+    const handleCustomPicture = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.[0] || !fabricCanvasRef.current) return;
+
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            if (!event.target?.result) return;
+
+            const imgObj = new Image();
+            imgObj.src = event.target.result as string;
+
+            imgObj.onload = () => {
+                const img = new fabric.Image(imgObj);
+                img.scaleToHeight(300);
+                img.scaleToWidth(300);
+                fabricCanvasRef.current?.centerObject(img);
+                fabricCanvasRef.current?.add(img);
+                fabricCanvasRef.current?.renderAll();
+            };
+        };
+
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    const exportImage = () => {
+        if (!tshirtDivRef.current) return;
+
+        domtoimage.toPng(tshirtDivRef.current)
+            .then((dataUrl: string) => {
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'tshirt-design.png';
+                link.href = dataUrl;
+                link.click();
+            })
+            .catch((error: never) => {
+                console.error('Error exporting image:', error);
+            });
+    };
+
     return (
-        <main className="flex flex-col">
-            <header className="p-4 bg-white border-b border-gray-200">
-                <h1 className="text-2xl font-bold text-gray-800">Canvas Editor</h1>
-            </header>
-            <section className="flex justify-center items-center p-6 overflow-auto">
-                <div className="bg-white border shadow rounded-lg overflow-hidden"
-                     style={{width: 600, height: "100%"}}>
-                    <canvas id="fabric-canvas" width={800} height={600}/>
-                </div>
-            </section>
-        </main>
-    );
-};
+        <div className="container mx-auto p-4">
+            <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex-1">
+                    {/* T-shirt design area */}
+                    <div
+                        id="tshirt-div"
+                        ref={tshirtDivRef}
+                        className="relative w-[452px] h-[548px] bg-white mx-auto"
+                    >
+                        <img
+                            id="tshirt-backgroundpicture"
+                            src="https://ourcodeworld.com/public-media/gallery/gallery-5d5afd3f1c7d6.png"
+                            className="absolute w-full h-full"
+                            alt="T-shirt base"
+                        />
 
-export default Editor;
+                        <div className={styles.drawingArea}>
+                            <div className={styles.canvasContainer}>
+                                <canvas
+                                    ref={canvasRef}
+                                    id="tshirt-canvas"
+                                    width="200"
+                                    height="400"
+                                    className={styles.canvas}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 max-w-md">
+                    <div className="space-y-4">
+                        <p className="text-sm text-gray-600">
+                            To remove a loaded picture on the T-Shirt select it and press the <kbd className="px-2 py-1 bg-gray-200 rounded">DEL</kbd> key.
+                        </p>
+
+                        <div>
+                            <label htmlFor="tshirt-design" className="block mb-2">T-Shirt Design:</label>
+                            <select
+                                id="tshirt-design"
+                                onChange={handleDesignChange}
+                                className="w-full p-2 border rounded"
+                            >
+                                <option value="">Select one of our designs ...</option>
+                                <option value="https://ourcodeworld.com/public-media/gallery/gallery-5d5b0e95d294c.png">Batman</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="tshirt-color" className="block mb-2">T-Shirt Color:</label>
+                            <select
+                                id="tshirt-color"
+                                onChange={handleColorChange}
+                                className="w-full p-2 border rounded"
+                                defaultValue="#fff"
+                            >
+                                <option value="#ffffff">White</option>
+                                <option value="#000000">Black</option>
+                                <option value="#ff0000">Red</option>
+                                <option value="#008000">Green</option>
+                                <option value="#ffff00">Yellow</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="tshirt-custompicture" className="block mb-2">Upload your own design:</label>
+                            <input
+                                type="file"
+                                id="tshirt-custompicture"
+                                onChange={handleCustomPicture}
+                                className="w-full p-2 border rounded"
+                                accept="image/*"
+                            />
+                        </div>
+
+                        <button
+                            onClick={exportImage}
+                            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
+                        >
+                            Export Design
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
