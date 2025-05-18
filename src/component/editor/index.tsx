@@ -43,10 +43,11 @@ export default function TshirtDesigner() {
     const updateTshirtImage = (imageURL: string) => {
         if (!fabricCanvasRef.current) return;
 
+        // @ts-ignore
         fabric.Image.fromURL(imageURL, (img: { scaleToHeight: (arg0: number) => void; scaleToWidth: (arg0: number) => void; }) => {
             img.scaleToHeight(300);
             img.scaleToWidth(300);
-            fabricCanvasRef.current?.centerObject(img);
+            fabricCanvasRef.current?.centerObject(img as FabricObject);
             fabricCanvasRef.current?.add(img);
             fabricCanvasRef.current?.renderAll();
         });
@@ -105,9 +106,9 @@ export default function TshirtDesigner() {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 bg-white h-full">
             <div className="flex flex-col md:flex-row gap-8">
-                <div className="flex-1">
+                <div className="flex-1 h-ful">
                     {/* T-shirt design area */}
                     <div
                         id="tshirt-div"
@@ -135,59 +136,6 @@ export default function TshirtDesigner() {
                     </div>
                 </div>
 
-                <div className="flex-1 max-w-md">
-                    <div className="space-y-4">
-                        <p className="text-sm text-gray-600">
-                            To remove a loaded picture on the T-Shirt select it and press the <kbd className="px-2 py-1 bg-gray-200 rounded">DEL</kbd> key.
-                        </p>
-
-                        <div>
-                            <label htmlFor="tshirt-design" className="block mb-2">T-Shirt Design:</label>
-                            <select
-                                id="tshirt-design"
-                                onChange={handleDesignChange}
-                                className="w-full p-2 border rounded"
-                            >
-                                <option value="">Select one of our designs ...</option>
-                                <option value="https://ourcodeworld.com/public-media/gallery/gallery-5d5b0e95d294c.png">Batman</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="tshirt-color" className="block mb-2">T-Shirt Color:</label>
-                            <select
-                                id="tshirt-color"
-                                onChange={handleColorChange}
-                                className="w-full p-2 border rounded"
-                                defaultValue="#fff"
-                            >
-                                <option value="#ffffff">White</option>
-                                <option value="#000000">Black</option>
-                                <option value="#ff0000">Red</option>
-                                <option value="#008000">Green</option>
-                                <option value="#ffff00">Yellow</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="tshirt-custompicture" className="block mb-2">Upload your own design:</label>
-                            <input
-                                type="file"
-                                id="tshirt-custompicture"
-                                onChange={handleCustomPicture}
-                                className="w-full p-2 border rounded"
-                                accept="image/*"
-                            />
-                        </div>
-
-                        <button
-                            onClick={exportImage}
-                            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
-                        >
-                            Export Design
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     );

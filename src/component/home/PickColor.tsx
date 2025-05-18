@@ -2,7 +2,7 @@ import React from 'react';
 
 const PickColor:React.FC = () => {
     return (
-        <aside className="w-80 bg-white border-l border-gray-200 p-4 flex-1 flex  flex-col">
+        <aside className="bg-white h-full p-4 flex-1 flex  flex-col">
             <h2 className="text-xl font-semibold mb-4">Properties</h2>
             {/* Placeholder for object editing UI */}
             <div className="flex-1 space-y-4 overflow-y-auto">
