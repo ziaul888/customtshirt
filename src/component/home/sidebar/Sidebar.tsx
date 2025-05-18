@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button"
+import { RemoveFormatting } from 'lucide-react';
 // 1. Define the props interface
 interface SidebarProps {
     selectedDesign: string;
@@ -13,21 +14,22 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedDesign, handleDesignSelect })
             <h2 className="text-xl font-semibold mb-4">Elements</h2>
             <div className="space-y-3 overflow-y-auto flex flex-1 flex-col gap-2">
                 <Button
-                    className="text-xs"
+                    className="text-xs cursor-pointer flex items-center gap-1 flex-col p-5 rounded"
                     variant="default"
                     onClick={() => handleDesignSelect('text')}
                 >
+                 <   RemoveFormatting/>
                     Add Text
                 </Button>
                 <Button
-                    className="text-xs"
+                    className="text-xs cursor-pointer"
                     variant="default"
                     onClick={() => handleDesignSelect('element')}
                 >
                     Add Element
                 </Button>
                 <Button
-                    className="text-xs"
+                    className="text-xs cursor-pointer"
                     variant="default"
                     onClick={() => handleDesignSelect('image')}
                 >
