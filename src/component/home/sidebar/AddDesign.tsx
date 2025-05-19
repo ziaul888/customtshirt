@@ -1,27 +1,38 @@
 import React from 'react';
 import AddText from './AddText';
-
+import * as fabric from 'fabric';
 interface SelectedDesignBoxProps {
     selectedDesign: string;
     frontCanvasRef: React.RefObject<HTMLCanvasElement>;
     backCanvasRef: React.RefObject<HTMLCanvasElement>;
-    handleColorChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    fabricFrontCanvasRef?: React.RefObject<fabric.Canvas>;
+    fabricBackCanvasRef?: React.RefObject<fabric.Canvas>;
+    currentView: 'front' | 'back';
+
 }
 
 const DesignB = () => <div>Design B Component</div>;
 
-const AddDesign: React.FC<SelectedDesignBoxProps> = ({ selectedDesign ,frontCanvasRef,backCanvasRef}) => {
+const AddDesign: React.FC<SelectedDesignBoxProps> = ({currentView, selectedDesign ,frontCanvasRef,backCanvasRef,fabricBackCanvasRef,fabricFrontCanvasRef}) => {
     let content;
     // Provide default value and onChange handler for AddText
     const [textValue, setTextValue] = React.useState('');
 
     // Add textValue to the canvas when it changes and 'text' is selected
-  
+
     console.log("textValue", textValue)
 
     switch (selectedDesign) {
         case 'text':
-            content = <AddText value={textValue} onChange={setTextValue}   />;
+            content = <AddText value={textValue} onChange={setTextValue}
+             frontCanvasRef={frontCanvasRef}
+                backCanvasRef={backCanvasRef}
+                fabricFrontCanvasRef={fabricFrontCanvasRef}
+                fabricBackCanvasRef={fabricBackCanvasRef}
+                               currentView={currentView}
+
+
+            />;
             break;
         case 'element':
             content = <DesignB />;

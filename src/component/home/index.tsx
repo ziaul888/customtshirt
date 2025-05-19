@@ -143,7 +143,12 @@ const Index = () => {
     return (
         <div className="flex flex-col md:flex-row h-screen bg-gray-100 gap-4 p-4">
             <div className="w-full md:w-[30%]">
-                <SelectDesign/>
+                <SelectDesign fabricFrontCanvasRef={fabricFrontCanvasRef}
+                              backCanvasRef={backCanvasRef || null}
+                              frontCanvasRef={frontCanvasRef}
+                              fabricBackCanvasRef={fabricBackCanvasRef || null}
+                              currentView={currentView}
+                />
             </div>
             <div className="w-full md:w-[40%]">
                 <TshirtDesigner tshirtImages={tshirtImages}
