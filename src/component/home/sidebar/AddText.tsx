@@ -14,13 +14,13 @@ interface AddTextProps {
 }
 
 const AddText: React.FC<AddTextProps> = ({
-                                             value,
-                                             onChange,
-                                             placeholder = "Enter your text here...",
-                                             fabricFrontCanvasRef,
-                                             currentView,
-                                             fabricBackCanvasRef
-                                         }) => {
+    value,
+    onChange,
+    placeholder = "Enter your text here...",
+    fabricFrontCanvasRef,
+    currentView,
+    fabricBackCanvasRef
+}) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fontSizeRef = useRef<HTMLInputElement>(null);
     const fontColorRef = useRef<HTMLInputElement>(null);
@@ -29,31 +29,89 @@ const AddText: React.FC<AddTextProps> = ({
     const textShadowRef = useRef<HTMLSelectElement>(null);
 
     const handleAddText = () => {
-        let canvas: fabric.Canvas | undefined;
+        // Get the active canvas based on current view
+        let canvas: fabric.Canvas | null = null;
 
         if (currentView === "front") {
-            canvas = fabricFrontCanvasRef?.current ?? undefined;
+            canvas = fabricFrontCanvasRef?.current ?? null;
         } else if (currentView === "back") {
-            canvas = fabricBackCanvasRef?.current ?? undefined;
+            canvas = fabricBackCanvasRef?.current ?? null;
         }
 
-        if (!canvas) return;
+        if (!canvas) {
+            console.error("Canvas not available");
+            return;
+        }
 
-        const text = new fabric.Textbox(value, {
-            left: 50,
-            top: 50,
-            fontSize: fontSizeRef.current ? parseInt(fontSizeRef.current.value) : 16,
-            fill: fontColorRef.current?.value || '#000000',
-            fontFamily: fontFamilyRef.current?.value || 'Arial',
-            textAlign: textAlignRef.current?.value as 'left' | 'center' | 'right' | 'justify',
-            //shadow: textShadowRef.current?.value !== 'none' ? textShadowRef.current?.value : undefined,
+        // Get canvas dimensions to position text in center
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+
+        // Check if text is empty
+        if (!value.trim()) {
+            alert("Please enter some text");
+            return;
+        }
+
+        // Create options for the Textbox
+        const fontSize = fontSizeRef.current ? parseInt(fontSizeRef.current.value) : 16;
+        const fontColor = fontColorRef.current?.value || '#000000';
+        const fontFamily = fontFamilyRef.current?.value || 'Arial';
+        const textAlign = textAlignRef.current?.value as fabric.TextboxTextAlign || 'left';
+        
+        // Get shadow value
+        const shadowValue = textShadowRef.current?.value || 'none';
+        
+        // Create text object with interactive properties
+        const textbox = new fabric.Textbox(value, {
+            left: canvasWidth / 2,
+            top: canvasHeight / 2,
+            fontSize: fontSize,
+            fill: fontColor,
+            fontFamily: fontFamily,
+            textAlign: textAlign,
+            width: Math.min(300, canvasWidth * 0.8), // Reasonable width that fits on canvas
+            originX: 'center',
+            originY: 'center',
+            centeredRotation: true,
+            lockScalingFlip: true,
+            selectable: true,
+            editable: true,
+            hasControls: true,
+            hasBorders: true
         });
+        
+        // Add shadow if selected
+        if (shadowValue !== 'none') {
+            const shadowParts = shadowValue.split(' ');
+            if (shadowParts.length >= 4) {
+                const offsetX = parseInt(shadowParts[0]);
+                const offsetY = parseInt(shadowParts[1]);
+                const blur = parseInt(shadowParts[2]);
+                const color = shadowParts[3];
+                
+                textbox.setShadow({
+                    color: color,
+                    blur: blur,
+                    offsetX: offsetX,
+                    offsetY: offsetY
+                });
+            }
+        }
 
-        canvas.add(text);
-        canvas.setActiveObject(text);
+        // Add the textbox to canvas and set it as active object
+        canvas.add(textbox);
+        canvas.setActiveObject(textbox);
+        
+        // Center the viewport on the text
+        canvas.centerObject(textbox);
+        
+        // Render the canvas to show changes
         canvas.renderAll();
+        
+        // Clear the text input after adding
+        onChange("");
     };
-
 
     return (
         <div className="flex flex-col gap-2">
@@ -95,6 +153,9 @@ const AddText: React.FC<AddTextProps> = ({
                     <option value="Arial">Arial</option>
                     <option value="Courier New">Courier New</option>
                     <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Impact">Impact</option>
                 </select>
             </div>
 
@@ -118,9 +179,9 @@ const AddText: React.FC<AddTextProps> = ({
                     className="w-full p-1 border border-gray-300 rounded"
                 >
                     <option value="none">None</option>
-                    <option value="2px 2px 2px #000000">2px 2px 2px #000000</option>
-                    <option value="4px 4px 4px #000000">4px 4px 4px #000000</option>
-                    <option value="6px 6px 6px #000000">6px 6px 6px #000000</option>
+                    <option value="2px 2px 2px #000000">Light Shadow</option>
+                    <option value="4px 4px 4px #000000">Medium Shadow</option>
+                    <option value="6px 6px 6px #000000">Heavy Shadow</option>
                 </select>
             </div>
 

@@ -66,7 +66,7 @@ export default function TshirtDesigner({tshirtImages, currentView, switchView,ha
 
                 {/* Back canvas */}
                 <canvas
-                  ref={backCanvasRef}
+                  ref={backCanvasRef }
                   id="tshirt-canvas-back"
                   width={200}
                   height={400}
