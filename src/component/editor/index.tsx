@@ -5,6 +5,7 @@ import * as fabric from 'fabric';
 import styles from '../../Tshirt.module.css';
 import backPart from "../../../public/crew_back.png"
 import EditorTop from './EditorTop';
+
 interface TshirtDesignerProps {
   tshirtImages: { front: string; back: string };
   currentView: 'front' | 'back';
@@ -15,26 +16,90 @@ interface TshirtDesignerProps {
   tshirtColor: string;
   tshirtDivRef: React.RefObject<HTMLDivElement | null>;
   setTshirtColor: React.Dispatch<React.SetStateAction<string>>;
-
-  
-  
+  fabricFrontCanvasRef: React.RefObject<fabric.Canvas | null>;
+  fabricBackCanvasRef: React.RefObject<fabric.Canvas | null>;
+  setCurrentView: React.Dispatch<React.SetStateAction<'front' | 'back'>>;
+  isSwitchingView: boolean;
 }
 
-
-export default function TshirtDesigner({tshirtImages, currentView, switchView,handleColorChange,tshirtDivRef,backCanvasRef,
-    frontCanvasRef,tshirtColor}: TshirtDesignerProps) {
+export default function TshirtDesigner({
+  tshirtImages, 
+  currentView, 
+  switchView,
+  handleColorChange,
+  tshirtDivRef,
+  backCanvasRef,
+  frontCanvasRef,
+  tshirtColor,
+  fabricFrontCanvasRef,
+  fabricBackCanvasRef,
+  setCurrentView,
+  isSwitchingView
+}: TshirtDesignerProps) {
   
+  // Ensure the back canvas is properly initialized and objects are selectable
+  useEffect(() => {
+    if (currentView === 'back' && fabricBackCanvasRef.current) {
+      // Make sure all objects on the back canvas are selectable
+      fabricBackCanvasRef.current.getObjects().forEach(obj => {
+        obj.set({
+          selectable: true,
+          hasControls: true,
+          evented: true,
+          lockMovementX: false,
+          lockMovementY: false,
+          lockScalingX: false,
+          lockScalingY: false,
+          lockRotation: false,
+        });
+      });
+      
+      fabricBackCanvasRef.current.renderAll();
+      fabricBackCanvasRef.current.requestRenderAll();
+    }
+  }, [currentView, fabricBackCanvasRef]);
+
+  // Force update canvas on view switch
+  useEffect(() => {
+    if (!isSwitchingView) {
+      const activeCanvas = currentView === 'front' 
+        ? fabricFrontCanvasRef.current 
+        : fabricBackCanvasRef.current;
+      
+      if (activeCanvas) {
+        setTimeout(() => {
+          // Ensure all objects are selectable again after view switch
+          activeCanvas.getObjects().forEach(obj => {
+            obj.set({
+              selectable: true,
+              hasControls: true,
+              evented: true,
+              lockMovementX: false,
+              lockMovementY: false,
+              lockScalingX: false,
+              lockScalingY: false,
+              lockRotation: false,
+              dirty: true
+            });
+          });
+          
+          activeCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+          activeCanvas.renderAll();
+          activeCanvas.requestRenderAll();
+        }, 100);
+      }
+    }
+  }, [currentView, isSwitchingView, fabricFrontCanvasRef, fabricBackCanvasRef]);
 
   return (
     <div className="container mx-auto p-4 bg-white rounded h-full border border-gray-200 rounded">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1">
           {/* View switch buttons */}
-         <EditorTop
+          <EditorTop
             currentView={currentView}
             switchView={switchView}
-         
-         />
+          />
 
           {/* T-shirt design area */}
           <div
@@ -54,56 +119,30 @@ export default function TshirtDesigner({tshirtImages, currentView, switchView,ha
             <div className={styles.drawingArea}>
               <div className={styles.canvasContainer}>
                 {/* Front canvas */}
-                <canvas
-                  ref={frontCanvasRef}
-                  id="tshirt-canvas-front"
-                  width={200}
-                  height={400}
-                  className={`${styles.canvas} ${
-                    currentView === 'front' ? 'block' : 'hidden'
-                  }`}
-                />
+                <div style={{ display: currentView === 'front' ? 'block' : 'none' }}>
+                  <canvas
+                    ref={frontCanvasRef}
+                    id="tshirt-canvas-front"
+                    width={200}
+                    height={400}
+                    className={styles.canvas}
+                  />
+                </div>
 
                 {/* Back canvas */}
-                <canvas
-                  ref={backCanvasRef }
-                  id="tshirt-canvas-back"
-                  width={200}
-                  height={400}
-                  className={`${styles.canvas} ${
-                    currentView === 'back' ? 'block' : 'hidden'
-                  }`}
-                />
+                <div style={{ display: currentView === 'back' ? 'block' : 'none' }}>
+                  <canvas
+                    ref={backCanvasRef}
+                    id="tshirt-canvas-back"
+                    width={200}
+                    height={400}
+                    className={styles.canvas}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* <div className="flex-1 max-w-md">
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              To remove a loaded picture on the T-Shirt select it and press the{' '}
-              <kbd className="px-2 py-1 bg-gray-200 rounded">DEL</kbd> key.
-            </p>
-            <div>
-              <label htmlFor="tshirt-color" className="block mb-2">
-                T-Shirt Color:
-              </label>
-              <select
-                id="tshirt-color"
-                onChange={handleColorChange}
-                className="w-full p-2 border rounded"
-                value={tshirtColor}
-              >
-                <option value="#ffffff">White</option>
-                <option value="#000000">Black</option>
-                <option value="#ff0000">Red</option>
-                <option value="#008000">Green</option>
-                <option value="#ffff00">Yellow</option>
-              </select>
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );
