@@ -1,6 +1,8 @@
 import React from 'react';
 import AddText from './AddText';
 import * as fabric from 'fabric';
+import AddEmoji from './AddEmoji';
+import AddImage from './AddImage';
 interface SelectedDesignBoxProps {
     selectedDesign: string;
     frontCanvasRef: React.RefObject<HTMLCanvasElement>;
@@ -13,29 +15,42 @@ interface SelectedDesignBoxProps {
 
 const DesignB = () => <div>Design B Component</div>;
 
-const AddDesign: React.FC<SelectedDesignBoxProps> = ({currentView, selectedDesign ,frontCanvasRef,backCanvasRef,fabricBackCanvasRef,fabricFrontCanvasRef}) => {
+const AddDesign: React.FC<SelectedDesignBoxProps> = ({currentView, 
+    selectedDesign,
+    frontCanvasRef,
+    backCanvasRef,
+    fabricBackCanvasRef,
+    fabricFrontCanvasRef
+}) => {
     let content;
     // Provide default value and onChange handler for AddText
     const [textValue, setTextValue] = React.useState('');
 
     // Add textValue to the canvas when it changes and 'text' is selected
-
+  
     console.log("textValue", textValue)
 
     switch (selectedDesign) {
         case 'text':
             content = <AddText value={textValue} onChange={setTextValue}
-             frontCanvasRef={frontCanvasRef}
+                frontCanvasRef={frontCanvasRef}
                 backCanvasRef={backCanvasRef}
                 fabricFrontCanvasRef={fabricFrontCanvasRef}
                 fabricBackCanvasRef={fabricBackCanvasRef}
-                               currentView={currentView}
+                currentView={currentView}
 
 
             />;
             break;
         case 'element':
-            content = <DesignB />;
+            content = <AddEmoji onAdd={function (emoji: string): void {
+                throw new Error('Function not implemented.');
+            } }/>;
+            break;
+          case 'image':
+            content = <AddImage onImageAdd={function (file: File): void {
+                throw new Error('Function not implemented.');
+            } }/>;
             break;
         default:
             content = <div>No design selected</div>;

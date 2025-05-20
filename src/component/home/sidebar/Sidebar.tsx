@@ -11,7 +11,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ selectedDesign, handleDesignSelect }) => {
     return (
         <div className="w-32 bg-white shadow-md p-4 p-4 border border-gray-200 rounded flex flex-col">
-            <h2 className="text-xl font-semibold mb-4">Elements</h2>
+            
             <div className="space-y-3 overflow-y-auto flex flex-1 flex-col gap-2">
                 <Button
                     className="text-xs cursor-pointer flex items-center gap-1 flex-col p-5 rounded"
