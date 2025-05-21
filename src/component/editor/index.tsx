@@ -1,9 +1,7 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-// @ts-ignore
+import { useEffect} from 'react';
 import * as fabric from 'fabric';
 import styles from '../../Tshirt.module.css';
-import backPart from "../../../public/crew_back.png"
 import EditorTop from './EditorTop';
 
 interface TshirtDesignerProps {

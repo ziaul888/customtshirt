@@ -310,9 +310,9 @@ const Index = () => {
             <div className="w-full md:w-[30%]">
                 <SelectDesign 
                     fabricFrontCanvasRef={fabricFrontCanvasRef}
-                    backCanvasRef={backCanvasRef}
-                    frontCanvasRef={frontCanvasRef}
-                    fabricBackCanvasRef={fabricBackCanvasRef}
+                    backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
+                    frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
+                    fabricBackCanvasRef={fabricBackCanvasRef as React.RefObject<HTMLCanvasElement>}
                     currentView={currentView}
                     handleAddEmoji={handleAddEmoji}
                     handleAddImage={handleAddImage}
@@ -324,8 +324,8 @@ const Index = () => {
                     tshirtImages={tshirtImages}
                     currentView={currentView}
                     switchView={switchView}
-                    frontCanvasRef={frontCanvasRef}
-                    backCanvasRef={backCanvasRef}
+                    frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
+                    backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
                     handleColorChange={handleColorChange}
                     tshirtColor={tshirtColor}
                     tshirtDivRef={tshirtDivRef}
