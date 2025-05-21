@@ -225,53 +225,84 @@ const Index = () => {
         }
     }, [tshirtColor]);
 
-    // Add text to the active canvas with proper properties
-    // const addTextToCanvas = (text: string) => {
-    //     const activeCanvas = currentView === 'front' 
-    //         ? fabricFrontCanvasRef.current 
-    //         : fabricBackCanvasRef.current;
-        
-    //     if (!activeCanvas) {
-    //         console.error("No active canvas available");
-    //         return;
-    //     }
-        
-    //     // Get canvas dimensions
-    //     const canvasWidth = activeCanvas.getWidth();
-    //     const canvasHeight = activeCanvas.getHeight();
-        
-    //     // Create interactive text object
-    //     const textObj = new fabric.IText(text, {
-    //         left: canvasWidth / 2,
-    //         top: canvasHeight / 2,
-    //         fontSize: 20,
-    //         fill: '#000000',
-    //         textAlign: 'center',
-    //         originX: 'center',
-    //         originY: 'center',
-    //         fontFamily: 'Arial',
-    //         selectable: true,
-    //         editable: true,
-    //         hasControls: true,
-    //         hasBorders: true
-    //     });
-        
-    //     // Add the text to canvas
-    //     activeCanvas.add(textObj);
-        
-    //     // Set as active object for immediate editing
-    //     activeCanvas.setActiveObject(textObj);
-        
-    //     // Save the updated canvas state
-    //     canvasStatesRef.current[currentView] = activeCanvas.toJSON();
-        
-    //     // Render changes
-    //     activeCanvas.renderAll();
-    // };
+
 
     const tshirtImages = {
         front: '/crew_front (Copy).png',
         back: '/crew_back.png',
+    };
+// Add emoji to the canvas
+    const handleAddEmoji = (emoji: string) => {
+        const fabricCanvas = currentView === 'front'
+            ? fabricFrontCanvasRef.current
+            : fabricBackCanvasRef.current;
+        if (fabricCanvas) {
+            const text = new fabric.Text(emoji, {
+                left: fabricCanvas.getWidth() / 2,
+                top: fabricCanvas.getHeight() / 2,
+                fontSize: 48,
+                originX: 'center',
+                originY: 'center',
+                selectable: true,
+                hasControls: true,
+            });
+            fabricCanvas.add(text);
+            fabricCanvas.setActiveObject(text);
+            fabricCanvas.renderAll();
+        }
+    };
+    // Add image to the canvas// Add image to the canvas
+    const handleAddImage = (file: File) => {
+        // Basic validation
+        if (!file || !file.type.startsWith('image/')) {
+            alert("Please select a valid image file");
+            return;
+        }
+
+        // Get the active canvas
+        const fabricCanvas = currentView === 'front'
+            ? fabricFrontCanvasRef.current
+            : fabricBackCanvasRef.current;
+
+        if (!fabricCanvas) {
+            console.error("Canvas is not initialized");
+            return;
+        }
+
+        // Create a temporary URL for the file
+        const objectUrl = URL.createObjectURL(file);
+
+        // Create an HTML image element first
+        const imgElement = new Image();
+        imgElement.onload = () => {
+            // Once the image is loaded, create a fabric.Image
+            const fabricImage = new fabric.Image(imgElement, {
+                left: fabricCanvas.getCenter().left,
+                top: fabricCanvas.getCenter().top,
+                originX: 'center',
+                originY: 'center',
+                scaleX: Math.min(0.5, 200 / imgElement.width),
+                scaleY: Math.min(0.5, 200 / imgElement.height)
+            });
+
+            // Add the image to the canvas
+            fabricCanvas.add(fabricImage);
+            fabricCanvas.setActiveObject(fabricImage);
+            fabricCanvas.renderAll();
+
+            // Release the object URL
+            URL.revokeObjectURL(objectUrl);
+        };
+
+        // Handle image loading errors
+        imgElement.onerror = () => {
+            console.error("Failed to load image");
+            URL.revokeObjectURL(objectUrl);
+            alert("Failed to load the selected image");
+        };
+
+        // Set the source to start loading
+        imgElement.src = objectUrl;
     };
 
     return (
@@ -283,6 +314,8 @@ const Index = () => {
                     frontCanvasRef={frontCanvasRef}
                     fabricBackCanvasRef={fabricBackCanvasRef}
                     currentView={currentView}
+                    handleAddEmoji={handleAddEmoji}
+                    handleAddImage={handleAddImage}
                    // addTextToCanvas={addTextToCanvas} // Pass the text addition function
                 />
             </div>

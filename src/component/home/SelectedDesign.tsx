@@ -10,9 +10,11 @@ interface SelectDesignProps {
     fabricFrontCanvasRef?: React.RefObject<fabric.Canvas>;
     fabricBackCanvasRef?: React.RefObject<fabric.Canvas>;
     currentView: 'front' | 'back';
+    handleAddEmoji: (emoji: string) => void;
+    handleAddImage: (file: File) => void;
 }
 
-const SelectDesign: React.FC<SelectDesignProps> = ({ frontCanvasRef,backCanvasRef,fabricBackCanvasRef,fabricFrontCanvasRef,currentView }: SelectDesignProps) => {
+const SelectDesign: React.FC<SelectDesignProps> = ({ handleAddImage,handleAddEmoji,frontCanvasRef,backCanvasRef,fabricBackCanvasRef,fabricFrontCanvasRef,currentView }: SelectDesignProps) => {
     const [selectedDesign, setSelectedDesign] = React.useState<string | null>(null);
      const handleDesignSelect = (design: string) => {
         setSelectedDesign(design);
@@ -27,6 +29,8 @@ const SelectDesign: React.FC<SelectDesignProps> = ({ frontCanvasRef,backCanvasRe
                        fabricFrontCanvasRef={fabricFrontCanvasRef}
                        fabricBackCanvasRef={fabricBackCanvasRef}
                        currentView={currentView || ""}
+                       handleAddEmoji={handleAddEmoji}
+                       handleAddImage={handleAddImage}
             />
         </aside>
     );

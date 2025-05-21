@@ -10,6 +10,9 @@ interface SelectedDesignBoxProps {
     fabricFrontCanvasRef?: React.RefObject<fabric.Canvas>;
     fabricBackCanvasRef?: React.RefObject<fabric.Canvas>;
     currentView: 'front' | 'back';
+    handleAddEmoji: (emoji: string) => void;
+    handleAddImage: (file: File) => void;
+
 
 }
 
@@ -20,7 +23,8 @@ const AddDesign: React.FC<SelectedDesignBoxProps> = ({currentView,
     frontCanvasRef,
     backCanvasRef,
     fabricBackCanvasRef,
-    fabricFrontCanvasRef
+    fabricFrontCanvasRef,
+                                                         handleAddEmoji,handleAddImage
 }) => {
     let content;
     // Provide default value and onChange handler for AddText
@@ -43,14 +47,10 @@ const AddDesign: React.FC<SelectedDesignBoxProps> = ({currentView,
             />;
             break;
         case 'element':
-            content = <AddEmoji onAdd={function (emoji: string): void {
-                throw new Error('Function not implemented.');
-            } }/>;
+            content = <AddEmoji onAdd={handleAddEmoji}/>;
             break;
           case 'image':
-            content = <AddImage onImageAdd={function (file: File): void {
-                throw new Error('Function not implemented.');
-            } }/>;
+            content = <AddImage onImageAdd={handleAddImage}/>;
             break;
         default:
             content = <div>No design selected</div>;
