@@ -31,7 +31,7 @@ const Index = () => {
 
         // Set proper dimensions for both canvases - using a wider canvas
         const canvasWidth = 200;
-        const canvasHeight = 500;
+        const canvasHeight = 400;
 
         // Cleanup any existing canvas instances to prevent duplicates
         if (fabricFrontCanvasRef.current) {
@@ -305,6 +305,98 @@ const Index = () => {
         imgElement.src = objectUrl;
     };
 
+
+    const exportDesign = async (format: 'png' | 'jpg' | 'svg' = 'png', quality: number = 1) => {
+        if (!tshirtDivRef.current) {
+            alert('Design area not found');
+            return;
+        }
+    
+        try {
+            // Get the current active canvas
+            const activeCanvas = currentView === 'front' 
+                ? fabricFrontCanvasRef.current 
+                : fabricBackCanvasRef.current;
+    
+            if (!activeCanvas) {
+                alert('Canvas not initialized');
+                return;
+            }
+    
+            // Create a temporary canvas to combine t-shirt background and design
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            if (!tempCtx) {
+                alert('Could not create export canvas');
+                return;
+            }
+    
+            // Set canvas dimensions to match the t-shirt div
+            const tshirtDiv = tshirtDivRef.current;
+            const rect = tshirtDiv.getBoundingClientRect();
+            tempCanvas.width = 451; // Fixed width from your design
+            tempCanvas.height = 537; // Fixed height from your design
+    
+            // Fill background with t-shirt color
+            tempCtx.fillStyle = tshirtColor;
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+            // Load and draw the t-shirt image
+            const tshirtImg = new Image();
+            tshirtImg.crossOrigin = 'anonymous';
+            
+            return new Promise<void>((resolve, reject) => {
+                tshirtImg.onload = () => {
+                    // Draw the t-shirt background image
+                    tempCtx.drawImage(tshirtImg, 0, 0, tempCanvas.width, tempCanvas.height);
+    
+                    // Get the canvas design as image and overlay it
+                    const canvasDataUrl = activeCanvas.toDataURL({
+                        format: format === 'jpg' ? 'jpeg' : 'png',
+                        quality: quality,
+                        multiplier: 2 // Higher resolution
+                    });
+    
+                    const designImg = new Image();
+                    designImg.onload = () => {
+                        // Calculate position to center the design on the t-shirt
+                        const designX = (tempCanvas.width - 200) / 2; // Center the 200px wide canvas
+                        const designY = 68; // Adjust this value to position design properly on t-shirt
+                        
+                        // Draw the design onto the t-shirt
+                        tempCtx.drawImage(designImg, designX, designY, 200, 400);
+    
+                        // Create download link
+                        const link = document.createElement('a');
+                        link.download = `tshirt-design-${currentView}-${Date.now()}.${format}`;
+                        link.href = tempCanvas.toDataURL(`image/${format === 'jpg' ? 'jpeg' : 'png'}`, quality);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+    
+                        resolve();
+                    };
+    
+                    designImg.onerror = () => {
+                        reject(new Error('Failed to load design image'));
+                    };
+    
+                    designImg.src = canvasDataUrl;
+                };
+    
+                tshirtImg.onerror = () => {
+                    reject(new Error('Failed to load t-shirt image'));
+                };
+    
+                tshirtImg.src = tshirtImages[currentView];
+            });
+    
+        } catch (error) {
+            console.error('Export error:', error);
+            alert('Failed to export design. Please try again.');
+        }
+    };
     return (
         <div className="flex flex-col md:flex-row h-screen bg-gray-100 gap-4 p-4">
             <div className="w-full md:w-[30%]">
@@ -321,6 +413,7 @@ const Index = () => {
             </div>
             <div className="w-full md:w-[40%]">
                 <TshirtDesigner 
+                    exportDesign={exportDesign}
                     tshirtImages={tshirtImages}
                     currentView={currentView}
                     switchView={switchView}

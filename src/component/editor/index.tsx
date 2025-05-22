@@ -18,21 +18,21 @@ interface TshirtDesignerProps {
   fabricBackCanvasRef: React.RefObject<fabric.Canvas | null>;
   setCurrentView: React.Dispatch<React.SetStateAction<'front' | 'back'>>;
   isSwitchingView: boolean;
+  exportDesign: (format: 'png' | 'jpg' | 'svg' | 'pdf', quality: number) => Promise<void>;
 }
 
 export default function TshirtDesigner({
   tshirtImages, 
   currentView, 
   switchView,
-  handleColorChange,
   tshirtDivRef,
   backCanvasRef,
   frontCanvasRef,
   tshirtColor,
   fabricFrontCanvasRef,
   fabricBackCanvasRef,
-  setCurrentView,
-  isSwitchingView
+  isSwitchingView,
+  exportDesign
 }: TshirtDesignerProps) {
   
   // Ensure the back canvas is properly initialized and objects are selectable
@@ -97,6 +97,7 @@ export default function TshirtDesigner({
           <EditorTop
             currentView={currentView}
             switchView={switchView}
+            exportDesign={exportDesign}
           />
 
           {/* T-shirt design area */}

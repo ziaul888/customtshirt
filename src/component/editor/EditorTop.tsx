@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 interface EditorTop {
     currentView: 'front' | 'back';
     switchView: (view: 'front' | 'back') => void;
+    exportDesign: (format: 'png' | 'jpg' | 'svg' | 'pdf', quality: number) => Promise<void>;
 }
 
-const EditorTop: React.FC<EditorTop> = ({currentView, switchView}) => {
+const EditorTop: React.FC<EditorTop> = ({currentView, switchView, exportDesign}) => {
 
 
     return (
@@ -20,10 +21,10 @@ const EditorTop: React.FC<EditorTop> = ({currentView, switchView}) => {
           </Button>
           <Button
             className="px-4 py-3 rounded bg-green-500 cursor-pointer hover:bg-green-300 transition"
-            onClick={() => {/* capture logic here */}}
-            title="Capture"
+            onClick={() => exportDesign('png', 1)}
+            title="Download"
           >
-            Capture
+            Download
           </Button>
           <Button
             className="px-4 py-3 rounded bg-red-500 cursor-pointer hover:bg-red-300 transition"
