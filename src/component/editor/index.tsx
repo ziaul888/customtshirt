@@ -1,148 +1,214 @@
-'use client';
-import { useEffect} from 'react';
+import React from 'react';
 import * as fabric from 'fabric';
-import styles from '../../Tshirt.module.css';
-import EditorTop from './EditorTop';
 
 interface TshirtDesignerProps {
-  tshirtImages: { front: string; back: string };
+  exportDesign: (format?: 'png' | 'jpg' | 'svg', quality?: number) => Promise<void>;
+  tshirtImages: {
+    front: string;
+    back: string;
+  };
   currentView: 'front' | 'back';
   switchView: (view: 'front' | 'back') => void;
   frontCanvasRef: React.RefObject<HTMLCanvasElement>;
   backCanvasRef: React.RefObject<HTMLCanvasElement>;
   handleColorChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   tshirtColor: string;
-  tshirtDivRef: React.RefObject<HTMLDivElement | null>;
-  setTshirtColor: React.Dispatch<React.SetStateAction<string>>;
-  fabricFrontCanvasRef: React.RefObject<fabric.Canvas | null>;
-  fabricBackCanvasRef: React.RefObject<fabric.Canvas | null>;
-  setCurrentView: React.Dispatch<React.SetStateAction<'front' | 'back'>>;
+  tshirtDivRef: React.RefObject<HTMLDivElement>;
+  fabricFrontCanvasRef: React.RefObject<fabric.Canvas>;
+  fabricBackCanvasRef: React.RefObject<fabric.Canvas>;
+  setCurrentView: (view: 'front' | 'back') => void;
+  setTshirtColor: (color: string) => void;
   isSwitchingView: boolean;
-  exportDesign: (format: 'png' | 'jpg' | 'svg' | 'pdf', quality: number) => Promise<void>;
+  // New props for sleeve colors
+  sleeveColors?: {
+    left: string;
+    right: string;
+    body: string;
+  };
+  handleSleeveColorChange?: (part: 'left' | 'right' | 'body', color: string) => void;
 }
 
-export default function TshirtDesigner({
-  tshirtImages, 
-  currentView, 
-  switchView,
-  tshirtDivRef,
-  backCanvasRef,
-  frontCanvasRef,
-  tshirtColor,
-  fabricFrontCanvasRef,
-  fabricBackCanvasRef,
-  isSwitchingView,
-  exportDesign
-}: TshirtDesignerProps) {
-  
-  // Ensure the back canvas is properly initialized and objects are selectable
-  useEffect(() => {
-    if (currentView === 'back' && fabricBackCanvasRef.current) {
-      // Make sure all objects on the back canvas are selectable
-      fabricBackCanvasRef.current.getObjects().forEach(obj => {
-        obj.set({
-          selectable: true,
-          hasControls: true,
-          evented: true,
-          lockMovementX: false,
-          lockMovementY: false,
-          lockScalingX: false,
-          lockScalingY: false,
-          lockRotation: false,
-        });
-      });
-      
-      fabricBackCanvasRef.current.renderAll();
-      fabricBackCanvasRef.current.requestRenderAll();
+const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
+                                                         exportDesign,
+                                                         tshirtImages,
+                                                         currentView,
+                                                         switchView,
+                                                         frontCanvasRef,
+                                                         backCanvasRef,
+                                                         handleColorChange,
+                                                         tshirtColor,
+                                                         tshirtDivRef,
+                                                         fabricFrontCanvasRef,
+                                                         fabricBackCanvasRef,
+                                                         setCurrentView,
+                                                         setTshirtColor,
+                                                         isSwitchingView,
+                                                         sleeveColors,
+                                                         handleSleeveColorChange
+                                                       }) => {
+  const handleExport = async (format: 'png' | 'jpg' | 'svg' = 'png') => {
+    try {
+      await exportDesign(format, 1);
+    } catch (error) {
+      console.error('Export failed:', error);
     }
-  }, [currentView, fabricBackCanvasRef]);
-
-  // Force update canvas on view switch
-  useEffect(() => {
-    if (!isSwitchingView) {
-      const activeCanvas = currentView === 'front' 
-        ? fabricFrontCanvasRef.current 
-        : fabricBackCanvasRef.current;
-      
-      if (activeCanvas) {
-        setTimeout(() => {
-          // Ensure all objects are selectable again after view switch
-          activeCanvas.getObjects().forEach(obj => {
-            obj.set({
-              selectable: true,
-              hasControls: true,
-              evented: true,
-              lockMovementX: false,
-              lockMovementY: false,
-              lockScalingX: false,
-              lockScalingY: false,
-              lockRotation: false,
-              dirty: true
-            });
-          });
-          
-          activeCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-          activeCanvas.renderAll();
-          activeCanvas.requestRenderAll();
-        }, 100);
-      }
-    }
-  }, [currentView, isSwitchingView, fabricFrontCanvasRef, fabricBackCanvasRef]);
+  };
 
   return (
-    <div className="container mx-auto p-4 bg-white rounded h-full border border-gray-200 rounded">
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-1">
-          {/* View switch buttons */}
-          <EditorTop
-            currentView={currentView}
-            switchView={switchView}
-            exportDesign={exportDesign}
-          />
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">T-Shirt Designer</h2>
 
-          {/* T-shirt design area */}
-          <div
-            id="tshirt-div"
-            ref={tshirtDivRef}
-            className="relative w-[451px] h-[537px] bg-white mx-auto"
-            style={{ backgroundColor: tshirtColor }}
-          >
-            <img
-              id="tshirt-backgroundpicture"
-              src={tshirtImages[currentView]}
-              className="absolute w-full h-full object-contain"
-              alt={`T-shirt ${currentView} view`}
-              draggable={false}
-            />
+        {/* View Controls */}
+        <div className="flex justify-center mb-6">
+          <div className="tshirt-view-controls">
+            <button
+                onClick={() => switchView('front')}
+                disabled={isSwitchingView}
+                className={`view-button ${currentView === 'front' ? 'active' : ''}`}
+            >
+              Front View
+            </button>
+            <button
+                onClick={() => switchView('back')}
+                disabled={isSwitchingView}
+                className={`view-button ${currentView === 'back' ? 'active' : ''}`}
+            >
+              Back View
+            </button>
+          </div>
+        </div>
 
-            <div className={styles.drawingArea}>
-              <div className={styles.canvasContainer}>
-                {/* Front canvas */}
+        {/* T-Shirt Display Area */}
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            <div
+                ref={tshirtDivRef}
+                className="tshirt-container"
+                style={{
+                  width: '300px',
+                  height: '358px',
+                  position: 'relative',
+                  backgroundColor: sleeveColors?.body || tshirtColor,
+                  backgroundImage: `url(${tshirtImages[currentView]})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+            >
+              {/* Individual sleeve coloring layers */}
+              {sleeveColors && (
+                  <>
+                    <div
+                        className="sleeve-left"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: sleeveColors.left,
+                          clipPath: 'polygon(0% 0%, 20% 0%, 25% 50%, 15% 100%, 0% 100%)',
+                          zIndex: 1
+                        }}
+                    />
+                    <div
+                        className="sleeve-right"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: sleeveColors.right,
+                          clipPath: 'polygon(80% 0%, 100% 0%, 100% 100%, 85% 100%, 75% 50%)',
+                          zIndex: 1
+                        }}
+                    />
+                    <div
+                        className="tshirt-body"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          backgroundColor: sleeveColors.body,
+                          clipPath: 'polygon(20% 0%, 80% 0%, 85% 100%, 15% 100%)',
+                          zIndex: 1
+                        }}
+                    />
+                  </>
+              )}
+
+              {/* T-shirt outline/design image */}
+              <img
+                  src={tshirtImages[currentView]}
+                  alt={`T-shirt ${currentView} view`}
+                  className="tshirt-image"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: 2,
+                    pointerEvents: 'none'
+                  }}
+              />
+
+              {/* Canvas Container */}
+              <div
+                  className="canvas-container"
+                  style={{
+                    position: 'absolute',
+                    top: '45px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 3
+                  }}
+              >
+                {/* Front Canvas */}
                 <div style={{ display: currentView === 'front' ? 'block' : 'none' }}>
                   <canvas
-                    ref={frontCanvasRef}
-                    id="tshirt-canvas-front"
-                    width={200}
-                    height={400}
-                    className={styles.canvas}
+                      ref={frontCanvasRef}
+                      width={200}
+                      height={400}
+                      style={{
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        backgroundColor: 'transparent'
+                      }}
                   />
                 </div>
 
-                {/* Back canvas */}
+                {/* Back Canvas */}
                 <div style={{ display: currentView === 'back' ? 'block' : 'none' }}>
                   <canvas
-                    ref={backCanvasRef}
-                    id="tshirt-canvas-back"
-                    width={200}
-                    height={400}
-                    className={styles.canvas}
+                      ref={backCanvasRef}
+                      width={200}
+                      height={400}
+                      style={{
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        backgroundColor: 'transparent'
+                      }}
                   />
                 </div>
               </div>
             </div>
+
+            {/* Loading Overlay */}
+            {isSwitchingView && (
+                <div className="loading-overlay">
+                  <div className="loading-spinner"></div>
+                </div>
+            )}
           </div>
         </div>
+
+
+        {/* Status Display */}
+
       </div>
-    </div>
   );
-}
+};
+
+export default TshirtDesigner;

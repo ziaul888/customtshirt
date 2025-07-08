@@ -15,7 +15,14 @@ const Index = () => {
     const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
     const [tshirtColor, setTshirtColor] = useState<string>('#ffffff');
     const [isSwitchingView, setIsSwitchingView] = useState(false);
-    
+
+    // New state for individual sleeve colors
+    const [sleeveColors, setSleeveColors] = useState({
+        left: '#ffffff',
+        right: '#ffffff',
+        body: '#ffffff'
+    });
+
     // Store canvas states as objects
     const canvasStatesRef = useRef<{
         front: any | null;
@@ -123,14 +130,14 @@ const Index = () => {
     // Handle view switching with improved visibility controls
     const switchView = async (view: 'front' | 'back') => {
         if (view === currentView ) return;
-        
+
         setIsSwitchingView(true);
-        
+
         // Save current canvas state before switching
-        const currentCanvas = currentView === 'front' 
-            ? fabricFrontCanvasRef.current 
+        const currentCanvas = currentView === 'front'
+            ? fabricFrontCanvasRef.current
             : fabricBackCanvasRef.current;
-        
+
         if (currentCanvas) {
             canvasStatesRef.current[currentView] = currentCanvas.toJSON();
         }
@@ -155,10 +162,10 @@ const Index = () => {
 
         // Load the new canvas state after a small delay
         setTimeout(() => {
-            const newCanvas = view === 'front' 
-                ? fabricFrontCanvasRef.current 
+            const newCanvas = view === 'front'
+                ? fabricFrontCanvasRef.current
                 : fabricBackCanvasRef.current;
-            
+
             if (newCanvas) {
                 if (canvasStatesRef.current[view]) {
                     newCanvas.loadFromJSON(canvasStatesRef.current[view], () => {
@@ -188,10 +195,10 @@ const Index = () => {
     // Force re-render when view changes
     useEffect(() => {
         const timer = setTimeout(() => {
-            const activeCanvas = currentView === 'front' 
-                ? fabricFrontCanvasRef.current 
+            const activeCanvas = currentView === 'front'
+                ? fabricFrontCanvasRef.current
                 : fabricBackCanvasRef.current;
-            
+
             if (activeCanvas) {
                 // Ensure all objects are selectable
                 activeCanvas.getObjects().forEach(obj => {
@@ -209,29 +216,60 @@ const Index = () => {
         return () => clearTimeout(timer);
     }, [currentView]);
 
-    // Handle T-shirt color change
+    // Handle T-shirt color change (for backward compatibility)
     const handleColorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const color = e.target.value;
         setTshirtColor(color);
+        // Update all sleeve colors to maintain consistency
+        setSleeveColors({
+            left: color,
+            right: color,
+            body: color
+        });
+        updateTshirtColors(color, color, color);
+    };
+
+    // New function to handle individual sleeve color changes
+    const handleSleeveColorChange = (part: 'left' | 'right' | 'body', color: string) => {
+        setSleeveColors(prev => ({
+            ...prev,
+            [part]: color
+        }));
+
+        const newColors = {
+            ...sleeveColors,
+            [part]: color
+        };
+
+        updateTshirtColors(newColors.left, newColors.right, newColors.body);
+    };
+
+    // Function to update the t-shirt visual with individual colors
+    const updateTshirtColors = (leftColor: string, rightColor: string, bodyColor: string) => {
         if (tshirtDivRef.current) {
-            tshirtDivRef.current.style.backgroundColor = color;
+            // Create a gradient or use CSS variables to handle different parts
+            // For now, we'll use the body color as the main background
+            // You can enhance this with CSS masks or SVG overlays for more precise control
+            tshirtDivRef.current.style.backgroundColor = bodyColor;
+
+            // Add CSS custom properties for sleeve colors
+            tshirtDivRef.current.style.setProperty('--left-sleeve-color', leftColor);
+            tshirtDivRef.current.style.setProperty('--right-sleeve-color', rightColor);
+            tshirtDivRef.current.style.setProperty('--body-color', bodyColor);
         }
     };
 
     // Set initial background color on mount
     useEffect(() => {
-        if (tshirtDivRef.current) {
-            tshirtDivRef.current.style.backgroundColor = tshirtColor;
-        }
-    }, [tshirtColor]);
-
-
+        updateTshirtColors(sleeveColors.left, sleeveColors.right, sleeveColors.body);
+    }, [sleeveColors]);
 
     const tshirtImages = {
         front: '/crew_front (Copy).png',
         back: '/crew_back.png',
     };
-// Add emoji to the canvas
+
+    // Add emoji to the canvas
     const handleAddEmoji = (emoji: string) => {
         const fabricCanvas = currentView === 'front'
             ? fabricFrontCanvasRef.current
@@ -251,7 +289,8 @@ const Index = () => {
             fabricCanvas.renderAll();
         }
     };
-    // Add image to the canvas// Add image to the canvas
+
+    // Add image to the canvas
     const handleAddImage = (file: File) => {
         // Basic validation
         if (!file || !file.type.startsWith('image/')) {
@@ -305,68 +344,65 @@ const Index = () => {
         imgElement.src = objectUrl;
     };
 
-
     const exportDesign = async (format: 'png' | 'jpg' | 'svg' = 'png', quality: number = 1) => {
         if (!tshirtDivRef.current) {
             alert('Design area not found');
             return;
         }
-    
+
         try {
             // Get the current active canvas
-            const activeCanvas = currentView === 'front' 
-                ? fabricFrontCanvasRef.current 
+            const activeCanvas = currentView === 'front'
+                ? fabricFrontCanvasRef.current
                 : fabricBackCanvasRef.current;
-    
+
             if (!activeCanvas) {
                 alert('Canvas not initialized');
                 return;
             }
-    
+
             // Create a temporary canvas to combine t-shirt background and design
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
-            
+
             if (!tempCtx) {
                 alert('Could not create export canvas');
                 return;
             }
-    
+
             // Set canvas dimensions to match the t-shirt div
-            const tshirtDiv = tshirtDivRef.current;
-            const rect = tshirtDiv.getBoundingClientRect();
             tempCanvas.width = 451; // Fixed width from your design
             tempCanvas.height = 537; // Fixed height from your design
-    
-            // Fill background with t-shirt color
-            tempCtx.fillStyle = tshirtColor;
+
+            // Fill background with body color (main t-shirt color)
+            tempCtx.fillStyle = sleeveColors.body;
             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
+
             // Load and draw the t-shirt image
             const tshirtImg = new Image();
             tshirtImg.crossOrigin = 'anonymous';
-            
+
             return new Promise<void>((resolve, reject) => {
                 tshirtImg.onload = () => {
                     // Draw the t-shirt background image
                     tempCtx.drawImage(tshirtImg, 0, 0, tempCanvas.width, tempCanvas.height);
-    
+
                     // Get the canvas design as image and overlay it
                     const canvasDataUrl = activeCanvas.toDataURL({
                         format: format === 'jpg' ? 'jpeg' : 'png',
                         quality: quality,
                         multiplier: 2 // Higher resolution
                     });
-    
+
                     const designImg = new Image();
                     designImg.onload = () => {
                         // Calculate position to center the design on the t-shirt
                         const designX = (tempCanvas.width - 200) / 2; // Center the 200px wide canvas
                         const designY = 68; // Adjust this value to position design properly on t-shirt
-                        
+
                         // Draw the design onto the t-shirt
                         tempCtx.drawImage(designImg, designX, designY, 200, 400);
-    
+
                         // Create download link
                         const link = document.createElement('a');
                         link.download = `tshirt-design-${currentView}-${Date.now()}.${format}`;
@@ -374,33 +410,34 @@ const Index = () => {
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-    
+
                         resolve();
                     };
-    
+
                     designImg.onerror = () => {
                         reject(new Error('Failed to load design image'));
                     };
-    
+
                     designImg.src = canvasDataUrl;
                 };
-    
+
                 tshirtImg.onerror = () => {
                     reject(new Error('Failed to load t-shirt image'));
                 };
-    
+
                 tshirtImg.src = tshirtImages[currentView];
             });
-    
+
         } catch (error) {
             console.error('Export error:', error);
             alert('Failed to export design. Please try again.');
         }
     };
+
     return (
         <div className="flex flex-col md:flex-row h-screen bg-gray-100 gap-4 p-4">
             <div className="w-full md:w-[30%]">
-                <SelectDesign 
+                <SelectDesign
                     fabricFrontCanvasRef={fabricFrontCanvasRef}
                     backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
                     frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
@@ -408,11 +445,10 @@ const Index = () => {
                     currentView={currentView}
                     handleAddEmoji={handleAddEmoji}
                     handleAddImage={handleAddImage}
-                   // addTextToCanvas={addTextToCanvas} // Pass the text addition function
                 />
             </div>
             <div className="w-full md:w-[40%]">
-                <TshirtDesigner 
+                <TshirtDesigner
                     exportDesign={exportDesign}
                     tshirtImages={tshirtImages}
                     currentView={currentView}
@@ -420,24 +456,32 @@ const Index = () => {
                     frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
                     backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
                     handleColorChange={handleColorChange}
-                    tshirtColor={tshirtColor}
+                    tshirtColor={sleeveColors.body} // Use body color as main color
                     tshirtDivRef={tshirtDivRef}
                     fabricFrontCanvasRef={fabricFrontCanvasRef}
                     fabricBackCanvasRef={fabricBackCanvasRef}
                     setCurrentView={setCurrentView}
                     setTshirtColor={setTshirtColor}
                     isSwitchingView={isSwitchingView}
-                  //  addTextToCanvas={addTextToCanvas} // Pass the text addition function
+                    // New props for sleeve colors
+                    sleeveColors={sleeveColors}
+                    handleSleeveColorChange={handleSleeveColorChange}
                 />
             </div>
             <div className="w-full md:w-[30%]">
-                <PickColor 
+                <PickColor
                     handleColorChange={(color: string) => {
                         setTshirtColor(color);
-                        if (tshirtDivRef.current) {
-                            tshirtDivRef.current.style.backgroundColor = color;
-                        }
-                    }} 
+                        setSleeveColors({
+                            left: color,
+                            right: color,
+                            body: color
+                        });
+                        updateTshirtColors(color, color, color);
+                    }}
+                    // New props for individual sleeve color control
+                    sleeveColors={sleeveColors}
+                    handleSleeveColorChange={handleSleeveColorChange}
                 />
             </div>
         </div>
