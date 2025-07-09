@@ -107,7 +107,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                           width: '100%',
                           height: '100%',
                           backgroundColor: sleeveColors.left,
-                          clipPath: 'polygon(0% 0%, 20% 0%, 25% 50%, 15% 100%, 0% 100%)',
+                          clipPath: 'polygon(0% 0%, 33% 0%, 25% 50%, 12% 100%, 0% 100%)',
                           zIndex: 1
                         }}
                     />
@@ -120,7 +120,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                           width: '100%',
                           height: '100%',
                           backgroundColor: sleeveColors.right,
-                          clipPath: 'polygon(80% 0%, 100% 0%, 100% 100%, 85% 100%, 75% 50%)',
+                          clipPath: 'polygon(81% 0%, 100% 0%, 100% 100%, 76% 100%, 73% 35%)',
                           zIndex: 1
                         }}
                     />
@@ -133,7 +133,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                           width: '100%',
                           height: '100%',
                           backgroundColor: sleeveColors.body,
-                          clipPath: 'polygon(20% 0%, 80% 0%, 85% 100%, 15% 100%)',
+                          clipPath: 'polygon(14% 0%, 86% 0%, 51% 100%, 43% 100%)',
                           zIndex: 1
                         }}
                     />

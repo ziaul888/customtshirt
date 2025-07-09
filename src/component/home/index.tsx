@@ -5,6 +5,7 @@ import SelectDesign from "@/component/home/SelectedDesign";
 import PickColor from "@/component/home/PickColor";
 import TshirtDesigner from "@/component/editor";
 import * as fabric from 'fabric';
+import TshirtSvg from "@/component/home/TshirtSvg";
 
 const Index = () => {
     const tshirtDivRef = useRef<HTMLDivElement>(null);
@@ -13,14 +14,14 @@ const Index = () => {
     const fabricFrontCanvasRef = useRef<fabric.Canvas | null>(null);
     const fabricBackCanvasRef = useRef<fabric.Canvas | null>(null);
     const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
-    const [tshirtColor, setTshirtColor] = useState<string>('#ffffff');
+    const [tshirtColor, setTshirtColor] = useState<string>('#000000');
     const [isSwitchingView, setIsSwitchingView] = useState(false);
 
     // New state for individual sleeve colors
     const [sleeveColors, setSleeveColors] = useState({
-        left: '#ffffff',
-        right: '#ffffff',
-        body: '#ffffff'
+        left: '#000000',
+        right: '#000000',
+        body: '#000000'
     });
 
     // Store canvas states as objects
@@ -467,6 +468,10 @@ const Index = () => {
                     sleeveColors={sleeveColors}
                     handleSleeveColorChange={handleSleeveColorChange}
                 />
+
+
+
+                {/*<TshirtSvg color={tshirtColor} />*/}
             </div>
             <div className="w-full md:w-[30%]">
                 <PickColor
