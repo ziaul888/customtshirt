@@ -6,6 +6,8 @@ import PickColor from "@/component/home/PickColor";
 import TshirtDesigner from "@/component/editor";
 import * as fabric from 'fabric';
 import TshirtSvg from "@/component/home/TshirtSvg";
+import Sidebar from './sidebar/Sidebar';
+import { log } from 'console';
 
 const Index = () => {
     const tshirtDivRef = useRef<HTMLDivElement>(null);
@@ -16,6 +18,10 @@ const Index = () => {
     const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
     const [tshirtColor, setTshirtColor] = useState<string>('#000000');
     const [isSwitchingView, setIsSwitchingView] = useState(false);
+     const [selectedDesign, setSelectedDesign] = React.useState<string | null>(null);
+         const handleDesignSelect = (design: string) => {
+            setSelectedDesign(design);
+         }
 
     // New state for individual sleeve colors
     const [sleeveColors, setSleeveColors] = useState({
@@ -39,7 +45,7 @@ const Index = () => {
 
         // Set proper dimensions for both canvases - using a wider canvas
         const canvasWidth = 200;
-        const canvasHeight = 400;
+        const canvasHeight = 300;
 
         // Cleanup any existing canvas instances to prevent duplicates
         if (fabricFrontCanvasRef.current) {
@@ -436,58 +442,17 @@ const Index = () => {
     };
 
     return (
-        <div className="flex flex-col md:flex-row h-screen bg-gray-100 gap-4 p-4">
-            <div className="w-full md:w-[30%]">
-                <SelectDesign
-                    fabricFrontCanvasRef={fabricFrontCanvasRef}
-                    backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
-                    frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
-                    fabricBackCanvasRef={fabricBackCanvasRef as React.RefObject<HTMLCanvasElement>}
-                    currentView={currentView}
-                    handleAddEmoji={handleAddEmoji}
-                    handleAddImage={handleAddImage}
-                />
+        <div className="flex flex-col md:flex-row h-screen gap-8 p-2">
+            <div className="flex-1">
+                 <Sidebar selectedDesign={selectedDesign}
+                  handleDesignSelect={handleDesignSelect} 
+                  />
+            </div> 
+              <div className="flex-2">
+                kde
             </div>
-            <div className="w-full md:w-[40%]">
-                <TshirtDesigner
-                    exportDesign={exportDesign}
-                    tshirtImages={tshirtImages}
-                    currentView={currentView}
-                    switchView={switchView}
-                    frontCanvasRef={frontCanvasRef as React.RefObject<HTMLCanvasElement>}
-                    backCanvasRef={backCanvasRef as React.RefObject<HTMLCanvasElement>}
-                    handleColorChange={handleColorChange}
-                    tshirtColor={sleeveColors.body} // Use body color as main color
-                    tshirtDivRef={tshirtDivRef}
-                    fabricFrontCanvasRef={fabricFrontCanvasRef}
-                    fabricBackCanvasRef={fabricBackCanvasRef}
-                    setCurrentView={setCurrentView}
-                    setTshirtColor={setTshirtColor}
-                    isSwitchingView={isSwitchingView}
-                    // New props for sleeve colors
-                    sleeveColors={sleeveColors}
-                    handleSleeveColorChange={handleSleeveColorChange}
-                />
-
-
-
-                {/*<TshirtSvg color={tshirtColor} />*/}
-            </div>
-            <div className="w-full md:w-[30%]">
-                <PickColor
-                    handleColorChange={(color: string) => {
-                        setTshirtColor(color);
-                        setSleeveColors({
-                            left: color,
-                            right: color,
-                            body: color
-                        });
-                        updateTshirtColors(color, color, color);
-                    }}
-                    // New props for individual sleeve color control
-                    sleeveColors={sleeveColors}
-                    handleSleeveColorChange={handleSleeveColorChange}
-                />
+              <div className="flex-1">
+                dkke
             </div>
         </div>
     );

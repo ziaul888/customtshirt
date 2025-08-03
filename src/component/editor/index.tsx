@@ -63,14 +63,14 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
           <div className="tshirt-view-controls">
             <button
                 onClick={() => switchView('front')}
-                disabled={isSwitchingView}
+                //disabled={isSwitchingView}
                 className={`view-button ${currentView === 'front' ? 'active' : ''}`}
             >
               Front View
             </button>
             <button
                 onClick={() => switchView('back')}
-                disabled={isSwitchingView}
+               // disabled={isSwitchingView}
                 className={`view-button ${currentView === 'back' ? 'active' : ''}`}
             >
               Back View
@@ -85,8 +85,8 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                 ref={tshirtDivRef}
                 className="tshirt-container"
                 style={{
-                  width: '300px',
-                  height: '358px',
+                  width: '550px',
+                  height: '658px',
                   position: 'relative',
                   backgroundColor: sleeveColors?.body || tshirtColor,
                   backgroundImage: `url(${tshirtImages[currentView]})`,
@@ -116,11 +116,11 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                         style={{
                           position: 'absolute',
                           top: 0,
-                          right: 0,
+                          right: "-13px",
                           width: '100%',
                           height: '100%',
                           backgroundColor: sleeveColors.right,
-                          clipPath: 'polygon(81% 0%, 100% 0%, 100% 100%, 76% 100%, 73% 35%)',
+                          clipPath: 'polygon(65% 0%, 100% 0%, 100% 100%, 86% 100%, 66% 24%)',
                           zIndex: 1
                         }}
                     />
@@ -129,7 +129,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                         style={{
                           position: 'absolute',
                           top: 0,
-                          left: 0,
+                          left: "2px",
                           width: '100%',
                           height: '100%',
                           backgroundColor: sleeveColors.body,
@@ -161,7 +161,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                   className="canvas-container"
                   style={{
                     position: 'absolute',
-                    top: '45px',
+                    top: '15px',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 3
@@ -172,7 +172,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                   <canvas
                       ref={frontCanvasRef}
                       width={200}
-                      height={400}
+                      height={300}
                       style={{
                         border: '1px solid rgba(0,0,0,0.1)',
                         backgroundColor: 'transparent'
@@ -185,22 +185,15 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                   <canvas
                       ref={backCanvasRef}
                       width={200}
-                      height={400}
+                      height={300}
                       style={{
-                        border: '1px solid rgba(0,0,0,0.1)',
+                       // border: '1px solid rgba(0,0,0,0.1)',
                         backgroundColor: 'transparent'
                       }}
                   />
                 </div>
               </div>
             </div>
-
-            {/* Loading Overlay */}
-            {isSwitchingView && (
-                <div className="loading-overlay">
-                  <div className="loading-spinner"></div>
-                </div>
-            )}
           </div>
         </div>
 
