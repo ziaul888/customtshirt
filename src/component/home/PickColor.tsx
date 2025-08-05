@@ -68,7 +68,7 @@ const PickColor: React.FC<PickColorProps> = ({
                         <button
                             key={color.value}
                             onClick={() => handleColorChange(color.value)}
-                            className="w-8 h-8 border-2 border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-8 h-8 border cursor-pointer border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500"
                             style={{ backgroundColor: color.value }}
                             title={color.name}
                         />
@@ -90,7 +90,7 @@ const PickColor: React.FC<PickColorProps> = ({
                                     <button
                                         key={color.value}
                                         onClick={() => handleSleeveColorChange('body', color.value)}
-                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="w-8 h-8 border cursor-pointer border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         style={{ backgroundColor: color.value }}
                                         title={color.name}
                                     />
@@ -107,7 +107,7 @@ const PickColor: React.FC<PickColorProps> = ({
                                     <button
                                         key={color.value}
                                         onClick={() => handleSleeveColorChange('left', color.value)}
-                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="w-8 h-8 border cursor-pointer border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         style={{ backgroundColor: color.value }}
                                         title={color.name}
                                     />
@@ -125,7 +125,7 @@ const PickColor: React.FC<PickColorProps> = ({
                                     <button
                                         key={color.value}
                                         onClick={(e) => handleSleeveColorChange('right', color.value)}
-                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        className="w-8 h-8 border cursor-pointer border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
                                         style={{ backgroundColor: color.value }}
                                         title={color.name}
                                     />
@@ -144,7 +144,7 @@ const PickColor: React.FC<PickColorProps> = ({
                             <button
                                 key={size.value}
                                 onClick={() => handleSizeChange(size.value)}
-                                className={`px-3 py-2 border-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                className={`px-3 py-2 border-1 rounded-[4px] cursor-pointer font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                     selectedSize === size.value
                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
@@ -159,7 +159,7 @@ const PickColor: React.FC<PickColorProps> = ({
                 <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Material</label>
                     <select
-                        className="w-full px-3 py-2 border-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-1 rounded-[4px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                         //value={selectedMaterial}
                         //onChange={(e) => handleMaterialChange(e.target.value)}
                     >

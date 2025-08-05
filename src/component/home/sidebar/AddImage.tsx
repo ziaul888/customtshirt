@@ -65,7 +65,7 @@ const AddImage: React.FC<AddImageProps> = ({ onImageAdd }) => {
             
            <Button
   onClick={handleButtonClick}
-  className="w-full h-[48px] rounded-[4px] bg-white text-black border border-gray-400 hover:bg-black hover:text-white cursor-pointer"
+  className="w-full h-[48px] rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white cursor-pointer"
 >
   <span className="text-[16px]">Add Text</span>
 </Button>

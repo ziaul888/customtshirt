@@ -339,7 +339,7 @@ const AddText: React.FC<AddTextProps> = ({
             {/*    />*/}
             {/*</div>*/}
           
-            <Button   onClick={handleAddText} className="rounded-[4px] h-[48px] bg-white text-black hover:bg-black hover:text-white border border-black cursor-pointer">
+            <Button   onClick={handleAddText} className="rounded-[4px] h-[48px] bg-white text-black hover:bg-black hover:text-white border border-gray-300 cursor-pointer">
                 <span className="text-[16px]">Add Text</span>
             </Button>
         </div>
