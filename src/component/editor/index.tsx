@@ -55,11 +55,11 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
   };
 
   return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">T-Shirt Designer</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg h-full">
+        {/* <h2 className="text-2xl font-bold mb-6 text-center">T-Shirt Designer</h2> */}
 
         {/* View Controls */}
-        <div className="flex justify-center mb-6">
+        {/* <div className="flex justify-center mb-6">
           <div className="tshirt-view-controls">
             <button
                 onClick={() => switchView('front')}
@@ -76,7 +76,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
               Back View
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* T-Shirt Display Area */}
         <div className="flex justify-center mb-6">
@@ -161,7 +161,7 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                   className="canvas-container"
                   style={{
                     position: 'absolute',
-                    top: '15px',
+                    top: '15%',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 3
@@ -171,8 +171,8 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                 <div style={{ display: currentView === 'front' ? 'block' : 'none' }}>
                   <canvas
                       ref={frontCanvasRef}
-                      width={200}
-                      height={300}
+                      width={220}
+                      height={400}
                       style={{
                         border: '1px solid rgba(0,0,0,0.1)',
                         backgroundColor: 'transparent'
@@ -184,8 +184,8 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                 <div style={{ display: currentView === 'back' ? 'block' : 'none' }}>
                   <canvas
                       ref={backCanvasRef}
-                      width={200}
-                      height={300}
+                      width={230}
+                      height={400}
                       style={{
                        // border: '1px solid rgba(0,0,0,0.1)',
                         backgroundColor: 'transparent'

@@ -16,7 +16,7 @@ const Index = () => {
     const fabricFrontCanvasRef = useRef<fabric.Canvas | null>(null);
     const fabricBackCanvasRef = useRef<fabric.Canvas | null>(null);
     const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
-    const [tshirtColor, setTshirtColor] = useState<string>('#000000');
+    const [tshirtColor, setTshirtColor] = useState<string>('#fffff');
     const [isSwitchingView, setIsSwitchingView] = useState(false);
     const [selectedDesign, setSelectedDesign] = React.useState<string>("text");
          const handleDesignSelect = (design: string) => {
@@ -442,19 +442,34 @@ const Index = () => {
     };
 
     return (
-        <div className="flex flex-col md:flex-row h-screen gap-8 p-2">
+        <div className="flex h-full flex-col md:flex-row h-screen gap-8 p-2">
             <div className="flex-1">
                  <Sidebar selectedDesign={selectedDesign}
                   handleDesignSelect={handleDesignSelect} 
                   />
             </div> 
               <div className="flex-2">
-               {/* <TshirtDesigner
-                    
-               /> */}
+               <TshirtDesigner
+                    exportDesign={exportDesign}
+                    tshirtImages={tshirtImages}
+                    currentView={currentView}
+                    switchView={switchView}
+                    fabricFrontCanvasRef={fabricFrontCanvasRef}
+                    fabricBackCanvasRef={fabricBackCanvasRef}
+                    canvasStatesRef={canvasStatesRef}
+                    handleColorChange={handleColorChange}
+                    sleeveColors={sleeveColors}
+                    handleSleeveColorChange={handleSleeveColorChange}
+                    tshirtColor={tshirtColor}
+
+               />
             </div>
               <div className="flex-1">
-               <PickColor/>
+               <PickColor 
+                    handleColorChange={handleColorChange}
+                    sleeveColors={sleeveColors}
+                    handleSleeveColorChange={handleSleeveColorChange}
+               />
             </div>
         </div>
     );

@@ -8,12 +8,16 @@ interface PickColorProps {
         body: string;
     };
     handleSleeveColorChange?: (part: 'left' | 'right' | 'body', color: string) => void;
+    selectedSize?: string;
+    handleSizeChange?: (size: string) => void;
 }
 
 const PickColor: React.FC<PickColorProps> = ({
                                                  handleColorChange,
                                                  sleeveColors,
-                                                 handleSleeveColorChange
+                                                 handleSleeveColorChange,
+                                                 selectedSize,
+                                                 handleSizeChange
                                              }) => {
     const colorOptions = [
         { name: 'White', value: '#ffffff' },
@@ -30,23 +34,46 @@ const PickColor: React.FC<PickColorProps> = ({
         { name: 'Maroon', value: '#800000' },
     ];
 
+    const sizeOptions = [
+        { name: 'XS', value: 'XS' },
+        { name: 'S', value: 'S' },
+        { name: 'M', value: 'M' },
+        { name: 'L', value: 'L' },
+        { name: 'XL', value: 'XL' },
+        { name: 'XXL', value: 'XXL' },
+    ];
+    // Material data for t-shirt options
+    const materialOptions = [
+        { name: 'Cotton', value: 'cotton' },
+        { name: 'Polyester', value: 'polyester' },
+        { name: 'Linen', value: 'linen' },
+        { name: 'Wool', value: 'wool' },
+        { name: 'Silk', value: 'silk' },
+        { name: 'Rayon', value: 'rayon' },
+        { name: 'Bamboo', value: 'bamboo' },
+        { name: 'Blend', value: 'blend' },
+    ];
+
     return (
-        <div className=" w-full bg-white p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">T-Shirt Colors</h3>
+        <div className="w-full h-full bg-white p-4 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold mb-4">T-Shirt Customization</h3>
+
+           
 
             {/* Overall Color Change (Backward Compatibility) */}
             <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Overall Color</label>
-                <select
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                >
+                <div className="grid grid-cols-6 gap-1">
                     {colorOptions.map((color) => (
-                        <option key={color.value} value={color.value}>
-                            {color.name}
-                        </option>
+                        <button
+                            key={color.value}
+                            onClick={() => handleColorChange(color.value)}
+                            className="w-8 h-8 border-2 border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{ backgroundColor: color.value }}
+                            title={color.name}
+                        />
                     ))}
-                </select>
+                </div>
             </div>
 
             {/* Individual Sleeve Color Controls */}
@@ -58,47 +85,34 @@ const PickColor: React.FC<PickColorProps> = ({
                     <div>
                         <label className="block text-sm font-medium mb-1">Body Color</label>
                         <div className="flex items-center space-x-2">
-                            <input
-                                type="color"
-                                value={sleeveColors.body}
-                                onChange={(e) => handleSleeveColorChange('body', e.target.value)}
-                                className="w-8 h-8 border border-gray-300 rounded cursor-pointer"
-                            />
-                            <select
-                                value={sleeveColors.body}
-                                onChange={(e) => handleSleeveColorChange('body', e.target.value)}
-                                className="flex-1 p-1 border border-gray-300 rounded-md text-sm"
-                            >
+                            <div className="flex-1 grid grid-cols-6 gap-1">
                                 {colorOptions.map((color) => (
-                                    <option key={color.value} value={color.value}>
-                                        {color.name}
-                                    </option>
+                                    <button
+                                        key={color.value}
+                                        onClick={() => handleSleeveColorChange('body', color.value)}
+                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        style={{ backgroundColor: color.value }}
+                                        title={color.name}
+                                    />
                                 ))}
-                            </select>
+                            </div>
                         </div>
                     </div>
-
-                    {/* Left Sleeve Color */}
                     <div>
                         <label className="block text-sm font-medium mb-1">Left Sleeve Color</label>
                         <div className="flex items-center space-x-2">
-                            <input
-                                type="color"
-                                value={sleeveColors.left}
-                                onChange={(e) => handleSleeveColorChange('left', e.target.value)}
-                                className="w-8 h-8 border border-gray-300 rounded cursor-pointer"
-                            />
-                            <select
-                                value={sleeveColors.left}
-                                onChange={(e) => handleSleeveColorChange('left', e.target.value)}
-                                className="flex-1 p-1 border border-gray-300 rounded-md text-sm"
-                            >
+                            
+                            <div className="flex-1 grid grid-cols-6 gap-1">
                                 {colorOptions.map((color) => (
-                                    <option key={color.value} value={color.value}>
-                                        {color.name}
-                                    </option>
+                                    <button
+                                        key={color.value}
+                                        onClick={() => handleSleeveColorChange('left', color.value)}
+                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        style={{ backgroundColor: color.value }}
+                                        title={color.name}
+                                    />
                                 ))}
-                            </select>
+                            </div>
                         </div>
                     </div>
 
@@ -106,28 +120,59 @@ const PickColor: React.FC<PickColorProps> = ({
                     <div>
                         <label className="block text-sm font-medium mb-1">Right Sleeve Color</label>
                         <div className="flex items-center space-x-2">
-                            <input
-                                type="color"
-                                value={sleeveColors.right}
-                                onChange={(e) => handleSleeveColorChange('right', e.target.value)}
-                                className="w-8 h-8 border border-gray-300 rounded cursor-pointer"
-                            />
-                            <select
-                                value={sleeveColors.right}
-                                onChange={(e) => handleSleeveColorChange('right', e.target.value)}
-                                className="flex-1 p-1 border border-gray-300 rounded-md text-sm"
-                            >
+                            <div className="flex-1 grid grid-cols-6 gap-1">
                                 {colorOptions.map((color) => (
-                                    <option key={color.value} value={color.value}>
-                                        {color.name}
-                                    </option>
+                                    <button
+                                        key={color.value}
+                                        onClick={(e) => handleSleeveColorChange('right', color.value)}
+                                        className="w-8 h-8 border border-gray-300 rounded-full hover:scale-110 transition-transform focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        style={{ backgroundColor: color.value }}
+                                        title={color.name}
+                                    />
                                 ))}
-                            </select>
+                            </div>
+                          
                         </div>
                     </div>
 
+                     {/* Size Selection */}
+            {/* {selectedSize !== undefined && handleSizeChange && ( */}
+                <div className="mb-6">
+                    <label className="block text-sm font-medium mb-2">Size</label>
+                    <div className="grid grid-cols-6 gap-2">
+                        {sizeOptions.map((size) => (
+                            <button
+                                key={size.value}
+                                onClick={() => handleSizeChange(size.value)}
+                                className={`px-3 py-2 border-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    selectedSize === size.value
+                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                                }`}
+                            >
+                                {size.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                {/* Material Selection */}
+                <div className="mb-6">
+                    <label className="block text-sm font-medium mb-2">Material</label>
+                    <select
+                        className="w-full px-3 py-2 border-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        //value={selectedMaterial}
+                        //onChange={(e) => handleMaterialChange(e.target.value)}
+                    >
+                        {materialOptions.map((material) => (
+                            <option key={material.value} value={material.value}>
+                                {material.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            {/* )} */}
                     {/* Quick Actions */}
-                    <div className="pt-4 border-t">
+                    {/* <div className="pt-4 border-t">
                         <h5 className="text-sm font-medium mb-2">Quick Actions</h5>
                         <div className="grid grid-cols-2 gap-2">
                             <button
@@ -150,12 +195,13 @@ const PickColor: React.FC<PickColorProps> = ({
                                 Swap Sleeves
                             </button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
-            )}
+            )} 
+            
 
             {/* Color Palette Grid */}
-            <div className="mt-6">
+            {/* <div className="mt-6">
                 <h4 className="text-md font-medium mb-2">Quick Colors</h4>
                 <div className="grid grid-cols-6 gap-2">
                     {colorOptions.map((color) => (
@@ -168,7 +214,7 @@ const PickColor: React.FC<PickColorProps> = ({
                         />
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

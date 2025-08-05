@@ -224,14 +224,7 @@ const AddText: React.FC<AddTextProps> = ({
                 >
                     <AlignCenter style={{ transform: "rotate(-90deg)" }} size={16} />
                 </button>
-                <button
-                    type="button"
-                    className={`px-2 py-1 border rounded ${textAlign === "justify" ? "bg-gray-300" : ""}`}
-                    title="Justify"
-                    onClick={() => setTextAlign("justify")}
-                >
-                    <AlignCenter style={{ opacity: 0.5 }} size={16} />
-                </button>
+            
             </div>
             </div>
              <div className="flex items-center gap-2 mb-4">

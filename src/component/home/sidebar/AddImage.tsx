@@ -40,7 +40,7 @@ const AddImage: React.FC<AddImageProps> = ({ onImageAdd }) => {
             style={{ display: 'none' }}
             onChange={handleFileChange}
             />
-            <div className='flex gap-2 mt-4 items-center mb-6'>
+            <div className='flex gap-2 flex-wrap mt-4 items-center mb-6'>
                 <Image
                     src={ima1}
                     alt="Preview"

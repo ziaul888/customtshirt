@@ -18,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedDesign, handleDesignSelect })
         shapes: <div className="text-gray-500">Shapes Tool Component</div>,
     };
     return (
-        <div className="w-full p-4 bg-white-100 rounded-md shadow-md">
+        <div className="w-full h-full p-4 bg-white-100 rounded-md shadow-md">
             <h1 className="text-lg font-semibold mb-4">Design Tools</h1>
             <div className="flex">
                 <Tabs className='w-full' value={selectedDesign} onValueChange={handleDesignSelect}>
