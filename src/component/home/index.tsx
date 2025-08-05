@@ -18,7 +18,7 @@ const Index = () => {
     const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
     const [tshirtColor, setTshirtColor] = useState<string>('#000000');
     const [isSwitchingView, setIsSwitchingView] = useState(false);
-     const [selectedDesign, setSelectedDesign] = React.useState<string | null>(null);
+    const [selectedDesign, setSelectedDesign] = React.useState<string>("text");
          const handleDesignSelect = (design: string) => {
             setSelectedDesign(design);
          }
@@ -449,10 +449,12 @@ const Index = () => {
                   />
             </div> 
               <div className="flex-2">
-                kde
+               {/* <TshirtDesigner
+                    
+               /> */}
             </div>
               <div className="flex-1">
-                dkke
+               <PickColor/>
             </div>
         </div>
     );

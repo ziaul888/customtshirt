@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import * as fabric from 'fabric';
+import { AlignCenter } from 'lucide-react';
 
 interface AddTextProps {
     value: string;
@@ -139,7 +140,153 @@ const AddText: React.FC<AddTextProps> = ({
                     />
                 </div>
             </div>
-
+            <div className="flex items-center gap-2 justify-between">
+                <div className="flex items-center gap-2">
+                <label className="text-gray-700 font-semibold text-[16px]">Style:</label>
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${isBold ? "bg-gray-300 font-bold" : ""}`}
+                    title="Bold"
+                    onClick={() => setIsBold((prev) => !prev)}
+                >
+                    B
+                </button>
+                {/* Underline */}
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${textAlign === "underline" ? "bg-gray-300 underline" : ""}`}
+                    title="Underline"
+                    onClick={() => {
+                        let canvas: fabric.Canvas | null = null;
+                        if (currentView === "front") {
+                            canvas = fabricFrontCanvasRef?.current ?? null;
+                        } else if (currentView === "back") {
+                            canvas = fabricBackCanvasRef?.current ?? null;
+                        }
+                        if (!canvas) return;
+                        const activeObj = canvas.getActiveObject();
+                        if (activeObj && activeObj.type === "textbox") {
+                            // @ts-ignore
+                            activeObj.set("underline", !(activeObj.get("underline")));
+                            canvas.renderAll();
+                        }
+                    }}
+                >
+                    U
+                </button>
+                {/* Italic */}
+                <button
+                    type="button"
+                    className="px-2 py-1 border rounded"
+                    title="Italic"
+                    onClick={() => {
+                        let canvas: fabric.Canvas | null = null;
+                        if (currentView === "front") {
+                            canvas = fabricFrontCanvasRef?.current ?? null;
+                        } else if (currentView === "back") {
+                            canvas = fabricBackCanvasRef?.current ?? null;
+                        }
+                        if (!canvas) return;
+                        const activeObj = canvas.getActiveObject();
+                        if (activeObj && activeObj.type === "textbox") {
+                            // @ts-ignore
+                            activeObj.set("fontStyle", activeObj.get("fontStyle") === "italic" ? "normal" : "italic");
+                            canvas.renderAll();
+                        }
+                    }}
+                >
+                    <span style={{ fontStyle: "italic" }}>I</span>
+                </button>
+            </div>
+            <div className="flex items-center gap-2">
+                <label className="text-gray-700 font-semibold text-[16px]">Align:</label>
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${textAlign === "left" ? "bg-gray-300" : ""}`}
+                    title="Align Left"
+                    onClick={() => setTextAlign("left")}
+                >
+                    <AlignCenter style={{ transform: "rotate(90deg)" }} size={16} />
+                </button>
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${textAlign === "center" ? "bg-gray-300" : ""}`}
+                    title="Align Center"
+                    onClick={() => setTextAlign("center")}
+                >
+                    <AlignCenter size={16} />
+                </button>
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${textAlign === "right" ? "bg-gray-300" : ""}`}
+                    title="Align Right"
+                    onClick={() => setTextAlign("right")}
+                >
+                    <AlignCenter style={{ transform: "rotate(-90deg)" }} size={16} />
+                </button>
+                <button
+                    type="button"
+                    className={`px-2 py-1 border rounded ${textAlign === "justify" ? "bg-gray-300" : ""}`}
+                    title="Justify"
+                    onClick={() => setTextAlign("justify")}
+                >
+                    <AlignCenter style={{ opacity: 0.5 }} size={16} />
+                </button>
+            </div>
+            </div>
+             <div className="flex items-center gap-2 mb-4">
+                <label className="text-gray-700 font-semibold text-[16px]">Color:</label>
+                <div className="flex gap-4">
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#000000" }}
+                        onClick={() => setFontColor("#000000")}
+                        aria-label="Black"
+                    />
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#ffffff" }}
+                        onClick={() => setFontColor("#ffffff")}
+                        aria-label="White"
+                    />
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#ff0000" }}
+                        onClick={() => setFontColor("#ff0000")}
+                        aria-label="Red"
+                    />
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#00ff00" }}
+                        onClick={() => setFontColor("#00ff00")}
+                        aria-label="Green"
+                    />
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#0000ff" }}
+                        onClick={() => setFontColor("#0000ff")}
+                        aria-label="Blue"
+                    />
+                    <button
+                        type="button"
+                        className="w-6 h-6 rounded border border-gray-300"
+                        style={{ backgroundColor: "#ffff00" }}
+                        onClick={() => setFontColor("#ffff00")}
+                        aria-label="Yellow"
+                    />
+                </div>
+                {/* <input
+                    type="color"
+                    value={fontColor}
+                    onChange={e => setFontColor(e.target.value)}
+                    className="w-16 h-10 p-1 border border-gray-300 rounded"
+                /> */}
+            </div>
             {/*<div className="flex items-center gap-2">*/}
             {/*    <label className="text-gray-700">Font Size</label>*/}
             {/*    <input*/}
@@ -199,8 +346,8 @@ const AddText: React.FC<AddTextProps> = ({
             {/*    />*/}
             {/*</div>*/}
           
-            <Button className="mt-2" onClick={handleAddText}>
-                Add Text
+            <Button   onClick={handleAddText} className="rounded-[4px] h-[48px] bg-white text-black hover:bg-black hover:text-white border border-black cursor-pointer">
+                <span className="text-[16px]">Add Text</span>
             </Button>
         </div>
     );

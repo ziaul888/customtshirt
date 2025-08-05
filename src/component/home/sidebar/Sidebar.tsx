@@ -5,7 +5,7 @@ import AddImage from "@/component/home/sidebar/AddImage";
 import AddEmoji from "@/component/home/sidebar/AddEmoji";
 // 1. Define the props interface
 interface SidebarProps {
-    selectedDesign: string | null;
+    selectedDesign: string ;
     handleDesignSelect: (design: string) => void;
 }
 
