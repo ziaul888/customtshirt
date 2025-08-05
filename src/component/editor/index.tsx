@@ -1,5 +1,6 @@
 import React from 'react';
 import * as fabric from 'fabric';
+import { Button } from '@/components/ui/button';
 
 interface TshirtDesignerProps {
   exportDesign: (format?: 'png' | 'jpg' | 'svg', quality?: number) => Promise<void>;
@@ -56,6 +57,49 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
 
   return (
       <div className="bg-white p-6 rounded-lg shadow-lg h-full">
+        <div className="flex justify-center gap-4 mb-4">
+          <Button
+          
+            onClick={() => {
+              // Reset both canvases and color selections
+              if (fabricFrontCanvasRef?.current) {
+                fabricFrontCanvasRef.current.clear();
+              }
+              if (fabricBackCanvasRef?.current) {
+                fabricBackCanvasRef.current.clear();
+              }
+              setTshirtColor('white');
+              if (handleSleeveColorChange) {
+                handleSleeveColorChange('left', 'white');
+                handleSleeveColorChange('right', 'white');
+                handleSleeveColorChange('body', 'white');
+              }
+            }}
+            className="px-6 py-2 cursor-pointer rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white transition-colors"
+          >
+            Reset
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              // Undo last action on the current canvas
+              const fabricCanvas =
+                currentView === 'front'
+                  ? fabricFrontCanvasRef?.current
+                  : fabricBackCanvasRef?.current;
+              if (fabricCanvas) {
+                const objects = fabricCanvas.getObjects();
+                if (objects.length > 0) {
+                  fabricCanvas.remove(objects[objects.length - 1]);
+                  fabricCanvas.renderAll();
+                }
+              }
+            }}
+            className="px-6 py-2 cursor-pointer rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white transition-colors"
+          >
+            Undo
+          </Button>
+        </div>
         {/* <h2 className="text-2xl font-bold mb-6 text-center">T-Shirt Designer</h2> */}
 
         {/* View Controls */}
@@ -196,7 +240,67 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
             </div>
           </div>
         </div>
-
+        <div className="flex justify-center mb-6">
+        <div className="flex gap-4">
+          <Button
+            className={`flex cursor-pointer text-black items-center px-4 py-2 rounded-[4px] border border-gray-300 bg-white hover:bg-black hover:text-white transition-colors ${
+              currentView === 'front' ? 'border-blue-600 border-2' : ''
+            }`}
+            onClick={() => setCurrentView('front')}
+            
+            title="Front"
+          >
+            {/* Front Icon */}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="12" height="16" rx="2" stroke="currentColor" />
+              <path d="M6 8h12" stroke="currentColor" />
+            </svg>
+            Front
+          </Button>
+          <Button
+            className={`flex cursor-pointer text-black items-center px-4 py-2 rounded-[4px] border border-gray-300 bg-white hover:bg-black hover:text-white transition-colors ${
+              currentView === 'back' ? 'border-blue-600 border-2' : ''
+            }`}
+            onClick={() => setCurrentView('back')}
+            title="Back"
+          >
+            {/* Back Icon */}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="12" height="16" rx="2" stroke="currentColor" />
+              <path d="M6 16h12" stroke="currentColor" />
+            </svg>
+            Back
+          </Button>
+          <Button
+            className="flex cursor-pointer text-black items-center px-4 py-2 rounded-[4px] border border-gray-300 bg-white hover:bg-black hover:text-white transition-colors"
+            onClick={() => {/* handle left view if needed */}}
+            type="button"
+            title="Left"
+          >
+            {/* Left Icon */}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="12" height="16" rx="2" stroke="currentColor" />
+              <path d="M6 12h4" stroke="currentColor" />
+              <path d="M8 10l-2 2 2 2" stroke="currentColor" />
+            </svg>
+            Left
+          </Button>
+          <Button
+            className="flex cursor-pointer text-black items-center px-4 py-2 rounded-[4px] border border-gray-300 bg-white hover:bg-black hover:text-white transition-colors"
+            onClick={() => {/* handle right view if needed */}}
+            type="button"
+            title="Right"
+          >
+            {/* Right Icon */}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="12" height="16" rx="2" stroke="currentColor" />
+              <path d="M14 12h4" stroke="currentColor" />
+              <path d="M16 10l2 2-2 2" stroke="currentColor" />
+            </svg>
+            Right
+          </Button>
+        </div>
+        </div>
 
         {/* Status Display */}
 

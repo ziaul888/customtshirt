@@ -3,12 +3,15 @@ import React from 'react';
 import { ImageDown } from 'lucide-react';
 import { Share } from 'lucide-react';
 import { ShoppingBag } from 'lucide-react';
-
+import Image from 'next/image';
+import logo from '../../../public/ChatGPT Image Aug 6, 2025, 12_55_41 AM.png';
 const Header: React.FC = () => {
     return (
         <header className="w-full bg-white shadow border-b border-gray-200 px-6 py-3 sticky top-0 z-50">
           <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">InkThread</h1>
+           <div style={{ maxHeight: '40px', display: 'flex', alignItems: 'center' }}>
+             <Image src={logo} alt="InkThread" width={100} height={50} style={{ maxHeight: '50px', width: 'auto', height: 'auto' }} />
+           </div>
             <div className="flex justify-between items-center text-gray-600 gap-4">
               <Button className="rounded-[4px] bg-white text-black hover:bg-black hover:text-white border border-gray-300 cursor-pointer">
                   <ImageDown className="w-4 h-4 mr-1" />
