@@ -7,7 +7,7 @@ import TshirtDesigner from "@/component/editor";
 import * as fabric from 'fabric';
 import TshirtSvg from "@/component/home/TshirtSvg";
 import Sidebar from './sidebar/Sidebar';
-import { log } from 'console';
+import { useDesignStore } from '@/stores';
 
 const Index = () => {
     const tshirtDivRef = useRef<HTMLDivElement>(null);
@@ -15,29 +15,33 @@ const Index = () => {
     const backCanvasRef = useRef<HTMLCanvasElement>(null);
     const fabricFrontCanvasRef = useRef<fabric.Canvas | null>(null);
     const fabricBackCanvasRef = useRef<fabric.Canvas | null>(null);
-    const [currentView, setCurrentView] = useState<'front' | 'back'>('front');
-    const [tshirtColor, setTshirtColor] = useState<string>('#fffff');
-    const [isSwitchingView, setIsSwitchingView] = useState(false);
-    const [selectedDesign, setSelectedDesign] = React.useState<string>("text");
-         const handleDesignSelect = (design: string) => {
-            setSelectedDesign(design);
-         }
 
-    // New state for individual sleeve colors
-    const [sleeveColors, setSleeveColors] = useState({
-        left: '#000000',
-        right: '#000000',
-        body: '#000000'
-    });
+    // Use Zustand stores
+    const {
+        currentView,
+        tshirtColor,
+        sleeveColors,
+        isSwitchingView,
+        canvasStates,
+        tshirtImages,
+        setCurrentView,
+        setTshirtColor,
+        setSleeveColors,
+        setIsSwitchingView,
+        switchView,
+        handleSleeveColorChange,
+        setCanvasRefs,
+        saveCanvasState,
+        addEmoji,
+        addImage,
+        addText,
+        clearCanvas,
+        undoLastAction,
+        resetDesign
+    } = useDesignStore();
 
-    // Store canvas states as objects
-    const canvasStatesRef = useRef<{
-        front: any | null;
-        back: any | null;
-    }>({
-        front: null,
-        back: null
-    });
+    // Store canvas states reference for compatibility
+    const canvasStatesRef = useRef(canvasStates);
 
     // Initialize both Fabric canvases with proper dimensions and configuration
     useEffect(() => {
@@ -79,11 +83,10 @@ const Index = () => {
             stopContextMenu: true
         });
 
-        // Set initial empty states
-        canvasStatesRef.current = {
-            front: fabricFrontCanvasRef.current.toJSON(),
-            back: fabricBackCanvasRef.current.toJSON()
-        };
+        // Set canvas refs in the store and initialize states
+        setCanvasRefs(fabricFrontCanvasRef, fabricBackCanvasRef);
+        saveCanvasState('front', fabricFrontCanvasRef.current.toJSON());
+        saveCanvasState('back', fabricBackCanvasRef.current.toJSON());
 
         // Ensure canvas is visible and properly sized
         if (fabricFrontCanvasRef.current && fabricBackCanvasRef.current) {
@@ -108,7 +111,7 @@ const Index = () => {
         const setupCanvasEvents = (canvas: fabric.Canvas) => {
             canvas.on('object:modified', () => {
                 const view = canvas === fabricFrontCanvasRef.current ? 'front' : 'back';
-                canvasStatesRef.current[view] = canvas.toJSON();
+                saveCanvasState(view, canvas.toJSON());
             });
         };
 
@@ -134,29 +137,16 @@ const Index = () => {
         };
     }, []);
 
-    // Handle view switching with improved visibility controls
-    const switchView = async (view: 'front' | 'back') => {
-        if (view === currentView ) return;
-
-        setIsSwitchingView(true);
-
-        // Save current canvas state before switching
-        const currentCanvas = currentView === 'front'
-            ? fabricFrontCanvasRef.current
-            : fabricBackCanvasRef.current;
-
-        if (currentCanvas) {
-            canvasStatesRef.current[currentView] = currentCanvas.toJSON();
-        }
-
-        // Get canvas container elements
+    // Custom switchView function that handles DOM manipulation
+    const handleSwitchView = async (view: 'front' | 'back') => {
+        // Get canvas container elements for DOM manipulation
         const frontCanvasContainer = frontCanvasRef.current?.parentElement;
         const backCanvasContainer = backCanvasRef.current?.parentElement;
 
-        // Switch to the new view
-        setCurrentView(view);
+        // Call the store's switchView function
+        await switchView(view);
 
-        // Toggle visibility of the canvases
+        // Handle DOM visibility (since Zustand shouldn't handle DOM directly)
         if (frontCanvasContainer && backCanvasContainer) {
             if (view === 'front') {
                 frontCanvasContainer.style.display = 'block';
@@ -166,37 +156,6 @@ const Index = () => {
                 backCanvasContainer.style.display = 'block';
             }
         }
-
-        // Load the new canvas state after a small delay
-        setTimeout(() => {
-            const newCanvas = view === 'front'
-                ? fabricFrontCanvasRef.current
-                : fabricBackCanvasRef.current;
-
-            if (newCanvas) {
-                if (canvasStatesRef.current[view]) {
-                    newCanvas.loadFromJSON(canvasStatesRef.current[view], () => {
-                        // Force re-render of all objects
-                        newCanvas.getObjects().forEach(obj => {
-                            obj.set({
-                                dirty: true,
-                                selectable: true, // Ensure all objects are selectable
-                                hasControls: true // Ensure all objects have controls
-                            });
-                        });
-                        newCanvas.renderAll();
-                        newCanvas.requestRenderAll();
-                        setIsSwitchingView(false);
-                    });
-                } else {
-                    newCanvas.clear();
-                    newCanvas.renderAll();
-                    setIsSwitchingView(false);
-                }
-            } else {
-                setIsSwitchingView(false);
-            }
-        }, 50);
     };
 
     // Force re-render when view changes
@@ -236,19 +195,16 @@ const Index = () => {
         updateTshirtColors(color, color, color);
     };
 
-    // New function to handle individual sleeve color changes
-    const handleSleeveColorChange = (part: 'left' | 'right' | 'body', color: string) => {
-        setSleeveColors(prev => ({
-            ...prev,
-            [part]: color
-        }));
-
-        const newColors = {
-            ...sleeveColors,
-            [part]: color
-        };
-
-        updateTshirtColors(newColors.left, newColors.right, newColors.body);
+    // Handle color change from PickColor component
+    const handleColorChangeFromPicker = (color: string) => {
+        setTshirtColor(color);
+        // Update all sleeve colors to maintain consistency
+        setSleeveColors({
+            left: color,
+            right: color,
+            body: color
+        });
+        updateTshirtColors(color, color, color);
     };
 
     // Function to update the t-shirt visual with individual colors
@@ -270,86 +226,6 @@ const Index = () => {
     useEffect(() => {
         updateTshirtColors(sleeveColors.left, sleeveColors.right, sleeveColors.body);
     }, [sleeveColors]);
-
-    const tshirtImages = {
-        front: '/crew_front (Copy).png',
-        back: '/crew_back.png',
-    };
-
-    // Add emoji to the canvas
-    const handleAddEmoji = (emoji: string) => {
-        const fabricCanvas = currentView === 'front'
-            ? fabricFrontCanvasRef.current
-            : fabricBackCanvasRef.current;
-        if (fabricCanvas) {
-            const text = new fabric.Text(emoji, {
-                left: fabricCanvas.getWidth() / 2,
-                top: fabricCanvas.getHeight() / 2,
-                fontSize: 48,
-                originX: 'center',
-                originY: 'center',
-                selectable: true,
-                hasControls: true,
-            });
-            fabricCanvas.add(text);
-            fabricCanvas.setActiveObject(text);
-            fabricCanvas.renderAll();
-        }
-    };
-
-    // Add image to the canvas
-    const handleAddImage = (file: File) => {
-        // Basic validation
-        if (!file || !file.type.startsWith('image/')) {
-            alert("Please select a valid image file");
-            return;
-        }
-
-        // Get the active canvas
-        const fabricCanvas = currentView === 'front'
-            ? fabricFrontCanvasRef.current
-            : fabricBackCanvasRef.current;
-
-        if (!fabricCanvas) {
-            console.error("Canvas is not initialized");
-            return;
-        }
-
-        // Create a temporary URL for the file
-        const objectUrl = URL.createObjectURL(file);
-
-        // Create an HTML image element first
-        const imgElement = new Image();
-        imgElement.onload = () => {
-            // Once the image is loaded, create a fabric.Image
-            const fabricImage = new fabric.Image(imgElement, {
-                left: fabricCanvas.getCenter().left,
-                top: fabricCanvas.getCenter().top,
-                originX: 'center',
-                originY: 'center',
-                scaleX: Math.min(0.5, 200 / imgElement.width),
-                scaleY: Math.min(0.5, 200 / imgElement.height)
-            });
-
-            // Add the image to the canvas
-            fabricCanvas.add(fabricImage);
-            fabricCanvas.setActiveObject(fabricImage);
-            fabricCanvas.renderAll();
-
-            // Release the object URL
-            URL.revokeObjectURL(objectUrl);
-        };
-
-        // Handle image loading errors
-        imgElement.onerror = () => {
-            console.error("Failed to load image");
-            URL.revokeObjectURL(objectUrl);
-            alert("Failed to load the selected image");
-        };
-
-        // Set the source to start loading
-        imgElement.src = objectUrl;
-    };
 
     const exportDesign = async (format: 'png' | 'jpg' | 'svg' = 'png', quality: number = 1) => {
         if (!tshirtDivRef.current) {
@@ -444,29 +320,31 @@ const Index = () => {
     return (
         <div className="flex h-full flex-col md:flex-row h-screen gap-8 p-2">
             <div className="flex-1">
-                 <Sidebar selectedDesign={selectedDesign}
-                  handleDesignSelect={handleDesignSelect} 
-                  />
+                 <Sidebar />
             </div> 
               <div className="flex-2">
                <TshirtDesigner
                     exportDesign={exportDesign}
                     tshirtImages={tshirtImages}
                     currentView={currentView}
-                    switchView={switchView}
+                    switchView={handleSwitchView}
                     fabricFrontCanvasRef={fabricFrontCanvasRef}
                     fabricBackCanvasRef={fabricBackCanvasRef}
-                    canvasStatesRef={canvasStatesRef}
+                    frontCanvasRef={frontCanvasRef}
+                    backCanvasRef={backCanvasRef}
+                    tshirtDivRef={tshirtDivRef}
+                    setCurrentView={setCurrentView}
+                    setTshirtColor={setTshirtColor}
+                    isSwitchingView={isSwitchingView}
                     handleColorChange={handleColorChange}
                     sleeveColors={sleeveColors}
                     handleSleeveColorChange={handleSleeveColorChange}
                     tshirtColor={tshirtColor}
-
                />
             </div>
               <div className="flex-1">
                <PickColor 
-                    handleColorChange={handleColorChange}
+                    handleColorChange={handleColorChangeFromPicker}
                     sleeveColors={sleeveColors}
                     handleSleeveColorChange={handleSleeveColorChange}
                />

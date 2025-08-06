@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { useDesignStore } from '@/stores';
 
 const emojis = [
   '😀', '😂', '😍', '😊', '😁', '😅', '😭', '🥰', '😎', '🤔', '😇', '👍', '👎',
@@ -9,17 +10,18 @@ const emojis = [
   '💋', '📸', '🎮', '🎵', '🎧', '💻', '📱', '✈️', '🏆'
 ];
 
-interface AddEmojiProps {
-  onAdd: (emoji: string) => void;
-}
-
-const AddEmoji: React.FC<AddEmojiProps> = ({ onAdd }) => {
+const AddEmoji: React.FC = () => {
+  const { addEmoji } = useDesignStore();
   const [selected, setSelected] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
   const handleSelect = (emoji: string) => {
     setSelected(emoji);
-    onAdd(emoji);
+  };
+  const handleAddEmoji = () => {
+    if (selected) {
+      addEmoji(selected);
+    }
   };
 
   const handleToggleMore = () => {
@@ -34,8 +36,8 @@ const AddEmoji: React.FC<AddEmojiProps> = ({ onAdd }) => {
         {visibleEmojis.map((emoji) => (
           <button
             key={emoji}
-            className={`text-[24px] p-2 rounded-[4px] bg-white border cursor-pointer ${
-              selected === emoji ? 'border-blue-600 border-2' : 'border-gray-300 border'
+            className={`text-[24px] p-2 rounded-[4px] bg-background border cursor-pointer ${
+              selected === emoji ? 'border-primary border-2' : 'border-border border'
             }`}
             onClick={() => handleSelect(emoji)}
             aria-label={`Add ${emoji}`}
@@ -47,15 +49,17 @@ const AddEmoji: React.FC<AddEmojiProps> = ({ onAdd }) => {
 
         <Button
           onClick={handleToggleMore}
-          className="h-[55px] rounded-[4px] bg-white text-black border border-gray-200 hover:bg-black hover:text-white cursor-pointer"
+          variant="outline"
+          className="h-[55px] rounded-[4px] cursor-pointer"
         >
           <span className="text-[16px]">{showAll ? 'Show Less' : '+ More'}</span>
         </Button>
       </div>
 
       <Button
-        // Optional: trigger another action
-        className="w-full h-[48px] rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white cursor-pointer"
+        onClick={handleAddEmoji}
+        variant="outline"
+        className="w-full h-[48px] rounded-[4px] cursor-pointer"
       >
         <span className="text-[16px]">Add Emoji</span>
       </Button>

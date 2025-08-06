@@ -466,21 +466,40 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .sleeve-color-controls {
-    background: #1f2937;
-    color: #f9fafb;
-  }
+.dark .sleeve-color-controls {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+}
 
-  .sleeve-color-select {
-    background: #374151;
-    color: #f9fafb;
-    border-color: #4b5563;
-  }
+.dark .sleeve-color-select {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
 
-  .export-controls {
-    background: #1f2937;
-  }
+.dark .export-controls {
+  background: hsl(var(--card));
+}
+
+.dark .loading-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.dark .view-button {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+
+.dark .view-button:hover {
+  background: hsl(var(--accent));
+}
+
+.dark .view-button.active {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
 }
 
 @layer base {

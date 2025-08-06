@@ -2,26 +2,11 @@ import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import * as fabric from 'fabric';
 import { AlignCenter } from 'lucide-react';
+import { useDesignStore } from '@/stores';
 
-interface AddTextProps {
-    value: string;
-    onChange: (value: string) => void;
-    placeholder?: string;
-    frontCanvasRef?: React.RefObject<HTMLCanvasElement>;
-    backCanvasRef?: React.RefObject<HTMLCanvasElement>;
-    fabricFrontCanvasRef?: React.RefObject<fabric.Canvas>;
-    fabricBackCanvasRef?: React.RefObject<fabric.Canvas>;
-    currentView: 'front' | 'back';
-}
-
-const AddText: React.FC<AddTextProps> = ({
-    value,
-    onChange,
-    placeholder = "Enter your text here...",
-    fabricFrontCanvasRef,
-    currentView,
-    fabricBackCanvasRef
-}) => {
+const AddText: React.FC = () => {
+    const { currentView, fabricFrontCanvasRef, fabricBackCanvasRef, addText } = useDesignStore();
+    const [value, setValue] = useState<string>("");
     // State for controls
     const [fontSize, setFontSize] = useState<number>(16);
     const [fontColor, setFontColor] = useState<string>("#000000");
@@ -31,51 +16,21 @@ const AddText: React.FC<AddTextProps> = ({
     // const [textShadow, setTextShadow] = useState<string>("none");
 
     const handleAddText = () => {
-        let canvas: fabric.Canvas | null = null;
-
-        if (currentView === "front") {
-            canvas = fabricFrontCanvasRef?.current ?? null;
-        } else if (currentView === "back") {
-            canvas = fabricBackCanvasRef?.current ?? null;
-        }
-
-        if (!canvas) {
-            console.error("Canvas not available");
-            return;
-        }
-
-        const canvasWidth = canvas.getWidth();
-        const canvasHeight = canvas.getHeight();
-
         if (!value.trim()) {
             alert("Please enter some text");
             return;
         }
 
-        const textbox = new fabric.Textbox(value, {
-            left: canvasWidth / 2,
-            top: canvasHeight / 2,
+        // Use the store's addText function with custom options
+        addText(value, {
             fontSize: fontSize,
             fill: fontColor,
             fontFamily: fontFamily,
             textAlign: textAlign,
             fontWeight: isBold ? 'bold' : 'normal',
-            width: Math.min(300, canvasWidth * 0.8),
-            originX: 'center',
-            originY: 'center',
-            centeredRotation: true,
-            lockScalingFlip: true,
-            selectable: true,
-            editable: true,
-            hasControls: true,
-            hasBorders: true
         });
 
-        canvas.add(textbox);
-        canvas.setActiveObject(textbox);
-        canvas.centerObject(textbox);
-        canvas.renderAll();
-        onChange("");
+        setValue(""); // Clear the input
     };
 
     // Update selected text properties when controls change
@@ -107,18 +62,18 @@ const AddText: React.FC<AddTextProps> = ({
         <div className="flex flex-col gap-4">
             <textarea
                 value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                className="w-full h-24 p-2 border border-gray-300 rounded"
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="Enter your text here..."
+                className="w-full h-24 p-2 border border-input rounded bg-background text-foreground"
                 style={{ resize: "none" }}
             />
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                    <label className="text-gray-700 font-semibold text-[16px]">Font:</label>
+                    <label className="text-foreground font-semibold text-[16px]">Font:</label>
                     <select
                         value={fontFamily}
                         onChange={e => setFontFamily(e.target.value)}
-                        className="w-full max-w-[80px] p-1 border border-gray-300 rounded"
+                        className="w-full max-w-[80px] p-1 border border-input rounded bg-background text-foreground"
                     >
                         <option value="Arial">Arial</option>
                         <option value="Courier New">Courier New</option>
@@ -129,23 +84,23 @@ const AddText: React.FC<AddTextProps> = ({
                     </select>
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="text-gray-700 font-semibold text-[16px]">Size:</label>
+                    <label className="text-foreground font-semibold text-[16px]">Size:</label>
                     <input
                         type="number"
                         min="8"
                         max="72"
                         value={fontSize}
                         onChange={e => setFontSize(Number(e.target.value))}
-                        className="w-16 p-1 border border-gray-300 rounded"
+                        className="w-16 p-1 border border-input rounded bg-background text-foreground"
                     />
                 </div>
             </div>
             <div className="flex items-center gap-2 justify-between">
                 <div className="flex items-center gap-2">
-                <label className="text-gray-700 font-semibold text-[16px]">Style:</label>
+                <label className="text-foreground font-semibold text-[16px]">Style:</label>
                 <button
                     type="button"
-                    className={`px-2 py-1 border rounded ${isBold ? "bg-gray-300 font-bold" : ""}`}
+                    className={`px-2 py-1 border border-input rounded bg-background hover:bg-accent ${isBold ? "bg-accent font-bold" : ""}`}
                     title="Bold"
                     onClick={() => setIsBold((prev) => !prev)}
                 >
@@ -154,7 +109,7 @@ const AddText: React.FC<AddTextProps> = ({
                 {/* Underline */}
                 <button
                     type="button"
-                    className={`px-2 py-1 border rounded ${textAlign === "underline" ? "bg-gray-300 underline" : ""}`}
+                    className="px-2 py-1 border border-input rounded bg-background hover:bg-accent"
                     title="Underline"
                     onClick={() => {
                         let canvas: fabric.Canvas | null = null;
@@ -177,7 +132,7 @@ const AddText: React.FC<AddTextProps> = ({
                 {/* Italic */}
                 <button
                     type="button"
-                    className="px-2 py-1 border rounded"
+                    className="px-2 py-1 border border-input rounded bg-background hover:bg-accent"
                     title="Italic"
                     onClick={() => {
                         let canvas: fabric.Canvas | null = null;
@@ -199,10 +154,10 @@ const AddText: React.FC<AddTextProps> = ({
                 </button>
             </div>
             <div className="flex items-center gap-2">
-                <label className="text-gray-700 font-semibold text-[16px]">Align:</label>
+                <label className="text-foreground font-semibold text-[16px]">Align:</label>
                 <button
                     type="button"
-                    className={`px-2 py-1 border rounded ${textAlign === "left" ? "bg-gray-300" : ""}`}
+                    className={`px-2 py-1 border border-input rounded bg-background hover:bg-accent ${textAlign === "left" ? "bg-accent" : ""}`}
                     title="Align Left"
                     onClick={() => setTextAlign("left")}
                 >
@@ -210,7 +165,7 @@ const AddText: React.FC<AddTextProps> = ({
                 </button>
                 <button
                     type="button"
-                    className={`px-2 py-1 border rounded ${textAlign === "center" ? "bg-gray-300" : ""}`}
+                    className={`px-2 py-1 border border-input rounded bg-background hover:bg-accent ${textAlign === "center" ? "bg-accent" : ""}`}
                     title="Align Center"
                     onClick={() => setTextAlign("center")}
                 >
@@ -218,7 +173,7 @@ const AddText: React.FC<AddTextProps> = ({
                 </button>
                 <button
                     type="button"
-                    className={`px-2 py-1 border rounded ${textAlign === "right" ? "bg-gray-300" : ""}`}
+                    className={`px-2 py-1 border border-input rounded bg-background hover:bg-accent ${textAlign === "right" ? "bg-accent" : ""}`}
                     title="Align Right"
                     onClick={() => setTextAlign("right")}
                 >
@@ -228,46 +183,46 @@ const AddText: React.FC<AddTextProps> = ({
             </div>
             </div>
              <div className="flex items-center gap-2 mb-4">
-                <label className="text-gray-700 font-semibold text-[16px]">Color:</label>
+                <label className="text-foreground font-semibold text-[16px]">Color:</label>
                 <div className="flex gap-4">
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#000000" }}
                         onClick={() => setFontColor("#000000")}
                         aria-label="Black"
                     />
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#ffffff" }}
                         onClick={() => setFontColor("#ffffff")}
                         aria-label="White"
                     />
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#ff0000" }}
                         onClick={() => setFontColor("#ff0000")}
                         aria-label="Red"
                     />
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#00ff00" }}
                         onClick={() => setFontColor("#00ff00")}
                         aria-label="Green"
                     />
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#0000ff" }}
                         onClick={() => setFontColor("#0000ff")}
                         aria-label="Blue"
                     />
                     <button
                         type="button"
-                        className="w-6 h-6 rounded border border-gray-300"
+                        className="w-6 h-6 rounded border border-input"
                         style={{ backgroundColor: "#ffff00" }}
                         onClick={() => setFontColor("#ffff00")}
                         aria-label="Yellow"
@@ -339,7 +294,7 @@ const AddText: React.FC<AddTextProps> = ({
             {/*    />*/}
             {/*</div>*/}
           
-            <Button   onClick={handleAddText} className="rounded-[4px] h-[48px] bg-white text-black hover:bg-black hover:text-white border border-gray-300 cursor-pointer">
+            <Button onClick={handleAddText} variant="outline" className="rounded-[4px] h-[48px] cursor-pointer">
                 <span className="text-[16px]">Add Text</span>
             </Button>
         </div>

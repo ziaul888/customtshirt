@@ -55,10 +55,8 @@ const PickColor: React.FC<PickColorProps> = ({
     ];
 
     return (
-        <div className="w-full h-full bg-white p-4 rounded-lg shadow-md">
+        <div className="w-full h-full p-4 bg-card rounded-md shadow-md border border-border">
             <h3 className="text-lg font-semibold mb-4">T-Shirt Customization</h3>
-
-           
 
             {/* Overall Color Change (Backward Compatibility) */}
             <div className="mb-6">

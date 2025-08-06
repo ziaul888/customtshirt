@@ -1,6 +1,7 @@
 import React from 'react';
 import * as fabric from 'fabric';
 import { Button } from '@/components/ui/button';
+import { useDesignStore } from '@/stores';
 
 interface TshirtDesignerProps {
   exportDesign: (format?: 'png' | 'jpg' | 'svg', quality?: number) => Promise<void>;
@@ -10,13 +11,13 @@ interface TshirtDesignerProps {
   };
   currentView: 'front' | 'back';
   switchView: (view: 'front' | 'back') => void;
-  frontCanvasRef: React.RefObject<HTMLCanvasElement>;
-  backCanvasRef: React.RefObject<HTMLCanvasElement>;
-  handleColorChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  frontCanvasRef?: React.RefObject<HTMLCanvasElement>;
+  backCanvasRef?: React.RefObject<HTMLCanvasElement>;
+  handleColorChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   tshirtColor: string;
-  tshirtDivRef: React.RefObject<HTMLDivElement>;
-  fabricFrontCanvasRef: React.RefObject<fabric.Canvas>;
-  fabricBackCanvasRef: React.RefObject<fabric.Canvas>;
+  tshirtDivRef?: React.RefObject<HTMLDivElement>;
+  fabricFrontCanvasRef?: React.RefObject<fabric.Canvas | null>;
+  fabricBackCanvasRef?: React.RefObject<fabric.Canvas | null>;
   setCurrentView: (view: 'front' | 'back') => void;
   setTshirtColor: (color: string) => void;
   isSwitchingView: boolean;
@@ -47,6 +48,8 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
                                                          sleeveColors,
                                                          handleSleeveColorChange
                                                        }) => {
+  const { resetDesign, undoLastAction } = useDesignStore();
+  
   const handleExport = async (format: 'png' | 'jpg' | 'svg' = 'png') => {
     try {
       await exportDesign(format, 1);
@@ -56,46 +59,20 @@ const TshirtDesigner: React.FC<TshirtDesignerProps> = ({
   };
 
   return (
-      <div className="bg-white p-6 rounded-lg shadow-lg h-full">
+      <div className="bg-card p-6 rounded-lg shadow-lg h-full border border-border">
         <div className="flex justify-center gap-4 mb-4">
           <Button
-          
-            onClick={() => {
-              // Reset both canvases and color selections
-              if (fabricFrontCanvasRef?.current) {
-                fabricFrontCanvasRef.current.clear();
-              }
-              if (fabricBackCanvasRef?.current) {
-                fabricBackCanvasRef.current.clear();
-              }
-              setTshirtColor('white');
-              if (handleSleeveColorChange) {
-                handleSleeveColorChange('left', 'white');
-                handleSleeveColorChange('right', 'white');
-                handleSleeveColorChange('body', 'white');
-              }
-            }}
-            className="px-6 py-2 cursor-pointer rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white transition-colors"
+            onClick={resetDesign}
+            variant="outline"
+            className="px-6 py-2 cursor-pointer rounded-[4px] transition-colors"
           >
             Reset
           </Button>
           <Button
             type="button"
-            onClick={() => {
-              // Undo last action on the current canvas
-              const fabricCanvas =
-                currentView === 'front'
-                  ? fabricFrontCanvasRef?.current
-                  : fabricBackCanvasRef?.current;
-              if (fabricCanvas) {
-                const objects = fabricCanvas.getObjects();
-                if (objects.length > 0) {
-                  fabricCanvas.remove(objects[objects.length - 1]);
-                  fabricCanvas.renderAll();
-                }
-              }
-            }}
-            className="px-6 py-2 cursor-pointer rounded-[4px] bg-white text-black border border-gray-300 hover:bg-black hover:text-white transition-colors"
+            onClick={undoLastAction}
+            variant="outline"
+            className="px-6 py-2 cursor-pointer rounded-[4px] transition-colors"
           >
             Undo
           </Button>
